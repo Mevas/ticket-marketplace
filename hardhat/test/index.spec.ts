@@ -7,16 +7,16 @@ describe("Ticket", function () {
     const token = await Deployer.deploy();
     await token.deployed();
 
-    const [owner, account1, ...otheraccounts] = await ethers.getSigners();
-    console.log(owner.address);
+    const recipient = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
-    expect(await token.balanceOf(owner.address)).to.equal(0);
+    let balance = await token.balanceOf(recipient);
+    expect(balance).to.equal(0);
 
-    await token.safeMint(owner.address, (await token.totalSupply()) + 1);
+    await token.safeMint(recipient);
 
-    expect(await token.ownerOf(1)).to.equal(owner.address);
+    balance = await token.balanceOf(recipient);
+    expect(balance).to.equal(1);
     // expect(await token.balanceOf(token.address)).to.equal(7);
-    return;
 
     // const setGreetingTx = await token.setGreeting("Hola, mundo!");
     //
