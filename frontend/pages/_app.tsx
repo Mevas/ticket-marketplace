@@ -2,6 +2,7 @@ import type { AppProps } from "next/app";
 import { NextUIProvider } from "@nextui-org/react";
 import { darkTheme, lightTheme } from "../theme";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { Layout } from "../components/Layout";
 
 const MyApp = ({ Component, pageProps }: AppProps) => (
   <NextThemesProvider
@@ -13,7 +14,9 @@ const MyApp = ({ Component, pageProps }: AppProps) => (
     }}
   >
     <NextUIProvider>
-      <Component {...pageProps} />
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
     </NextUIProvider>
   </NextThemesProvider>
 );

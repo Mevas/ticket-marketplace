@@ -1,6 +1,11 @@
 import React from "react";
-import { Container } from "@nextui-org/react";
+import { Navbar } from "./Navbar";
 
-export const Layout = () => {
-  return <Container></Container>;
+export const Layout = ({ children }: React.PropsWithChildren<{}>) => {
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  );
 };
