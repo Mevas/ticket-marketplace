@@ -1,30 +1,65 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
-import { ethers } from "hardhat";
+/* eslint-disable no-process-exit */
+// This is a script for deploying your contracts. You can adapt it to deploy
+// yours, or create new ones.
+import path from "path";
+import { artifacts, ethers, network } from "hardhat";
+import { Contract } from "ethers";
 
-async function main() {
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
+const tokenName = "Ticket";
 
-  // We get the contract to deploy
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
+const main = async () => {
+  // This is just a convenience check
+  if (network.name === "hardhat") {
+    console.warn(
+      "You are trying to deploy a contract to the Hardhat Network, which" +
+        "gets automatically created and destroyed every time. Use the Hardhat" +
+        " option '--network localhost'"
+    );
+  }
 
-  await greeter.deployed();
+  // ethers is available in the global scope
+  const [deployer] = await ethers.getSigners();
+  console.log(
+    "Deploying the contracts with the account:",
+    await deployer.getAddress()
+  );
 
-  console.log("Greeter deployed to:", greeter.address);
-}
+  console.log("Account balance:", (await deployer.getBalance()).toString());
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  const Token = await ethers.getContractFactory(tokenName);
+  const token = await Token.deploy();
+  await token.deployed();
+
+  console.log(`${tokenName} address:`, token.address);
+
+  // We also save the contract's artifacts and address in the frontend directory
+  saveFrontendFiles(token);
+};
+
+const saveFrontendFiles = (token: Contract) => {
+  const fs = require("fs");
+  const contractsDir = path.join(__dirname, "../../frontend/src/contracts");
+
+  if (!fs.existsSync(contractsDir)) {
+    fs.mkdirSync(contractsDir, { recursive: true });
+  }
+
+  fs.writeFileSync(
+    contractsDir + "/contract-address.json",
+    JSON.stringify({ [tokenName]: token.address }, undefined, 2)
+  );
+
+  const TokenArtifact = artifacts.readArtifactSync(tokenName);
+
+  fs.writeFileSync(
+    contractsDir + `/${tokenName}.json`,
+    JSON.stringify(TokenArtifact, null, 2)
+  );
+};
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });

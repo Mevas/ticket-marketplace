@@ -1,8 +1,13 @@
 import type { NextPage } from "next";
-import { Button } from "@nextui-org/react";
+import { Container } from "@nextui-org/react";
+import { Account } from "../components/Account";
 
 const Home: NextPage = () => {
-  return <Button>Hello</Button>;
+  return (
+    <Container display="flex" justify="center" css={{ mt: "$xl" }}>
+      <Account />
+    </Container>
+  );
 };
 
 export default Home;

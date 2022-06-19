@@ -4,6 +4,12 @@ import { darkTheme, lightTheme } from "../theme";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Layout } from "../components/Layout";
 
+import { createClient, WagmiConfig } from "wagmi";
+
+const client = createClient({
+  autoConnect: true,
+});
+
 const MyApp = ({ Component, pageProps }: AppProps) => (
   <NextThemesProvider
     defaultTheme="system"
@@ -14,9 +20,11 @@ const MyApp = ({ Component, pageProps }: AppProps) => (
     }}
   >
     <NextUIProvider>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <WagmiConfig client={client}>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </WagmiConfig>
     </NextUIProvider>
   </NextThemesProvider>
 );
