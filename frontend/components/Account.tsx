@@ -36,7 +36,7 @@ export const Account = () => {
       }
 
       const connection = await contract.connect(account.address);
-      console.log(await connection.count());
+      console.log(await connection.totalSupply(1));
     })();
   }, [account, contract, signer]);
 
@@ -72,7 +72,9 @@ export const Account = () => {
         <Button onClick={() => disconnect()}>Disconnect</Button>
       </Box>
 
-      <Button onClick={async () => contract.safeMint(address)}>Mint</Button>
+      <Button onClick={async () => contract.mint(address, 1, 5, "0x00")}>
+        Mint
+      </Button>
 
       {}
     </Box>
