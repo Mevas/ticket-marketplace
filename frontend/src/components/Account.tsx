@@ -1,5 +1,5 @@
-import React from "react";
-import { Button, Text } from "@nextui-org/react";
+import React, { useState } from "react";
+import { Button, Loading, Text } from "@nextui-org/react";
 import {
   useAccount,
   useConnect,
@@ -21,10 +21,16 @@ export const Account = () => {
   const contract = useTicketContract();
   const { balance, getBalance } = useBalance();
 
+  const [loading, setLoading] = useState<boolean | string>(false);
+
   if (!account?.address) {
     return (
       <Button onClick={() => connect(connectors[0])}>Connect MetaMask</Button>
     );
+  }
+
+  if (loading) {
+    return <Loading size="xl">{loading}</Loading>;
   }
 
   const address = account.address;
@@ -46,9 +52,12 @@ export const Account = () => {
 
       <Button
         onClick={async () => {
+          setLoading("Transacting...");
           const test = await contract.mint(address, 1, 5, "0x00");
+          setLoading("Minting...");
           await test.wait();
           await getBalance(1);
+          setLoading(false);
         }}
       >
         Mint
