@@ -6,10 +6,12 @@ import {
   useDisconnect,
   useEnsAvatar,
   useEnsName,
+  useSigner,
 } from "wagmi";
 import { Box } from "./Box";
 import { useTicketContract } from "../hooks/use-ticket-contract";
 import { useBalance } from "../hooks/use-balance";
+import { useTicket } from "../hooks/use-ticket";
 
 export const Account = () => {
   const { data: account } = useAccount();
@@ -22,6 +24,9 @@ export const Account = () => {
   const { balance, getBalance } = useBalance();
 
   const [loading, setLoading] = useState<boolean | string>(false);
+
+  const { data: ticket } = useTicket(1);
+  console.log(ticket);
 
   if (!account?.address) {
     return (
