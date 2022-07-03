@@ -3,17 +3,13 @@ import { Button, Text } from "@nextui-org/react";
 import {
   useAccount,
   useConnect,
-  useContract,
   useDisconnect,
   useEnsAvatar,
   useEnsName,
-  useSigner,
 } from "wagmi";
 import { Box } from "./Box";
-
-import contractAddresses from "../src/contracts/contract-address.json";
-import TicketABI from "../src/contracts/Ticket.json";
-import { Ticket } from "../src/hardhat/typechain-types";
+import { useTicketContract } from "../hooks/use-ticket-contract";
+import { useBalance } from "../hooks/use-balance";
 
 export const Account = () => {
   const { data: account } = useAccount();
@@ -21,24 +17,15 @@ export const Account = () => {
   const { data: ensName } = useEnsName({ address: account?.address });
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
-  const { data: signer } = useSigner();
-  const contract = useContract<Ticket>({
-    addressOrName: contractAddresses.Ticket,
-    contractInterface: TicketABI.abi,
-    signerOrProvider: signer,
-  });
-  console.log(contract);
+
+  const contract = useTicketContract();
+  const { balance, getBalance } = useBalance();
 
   useEffect(() => {
     (async () => {
-      if (!account || !account.address || !signer) {
-        return;
-      }
-
-      const connection = await contract.connect(account.address);
-      console.log(await connection.totalSupply(1));
+      await getBalance(1);
     })();
-  }, [account, contract, signer]);
+  }, [getBalance]);
 
   // useEffect(() => {
   //   // if (!signer || !account.address) {
@@ -53,7 +40,6 @@ export const Account = () => {
       <Button onClick={() => connect(connectors[0])}>Connect MetaMask</Button>
     );
   }
-  // contract.balanceOf(account.address).then((r) => console.log(r));
 
   const address = account.address;
 
@@ -72,11 +58,23 @@ export const Account = () => {
         <Button onClick={() => disconnect()}>Disconnect</Button>
       </Box>
 
-      <Button onClick={async () => contract.mint(address, 1, 5, "0x00")}>
+      <Button
+        onClick={async () => {
+          const test = await contract.mint(address, 1, 5, "0x00");
+          await test.wait();
+          await getBalance(1);
+        }}
+      >
         Mint
       </Button>
 
-      {}
+      {Object.entries(balance).map(([id, value]) => {
+        return (
+          <Box key={id}>
+            {id}: {value}
+          </Box>
+        );
+      })}
     </Box>
   );
 };
