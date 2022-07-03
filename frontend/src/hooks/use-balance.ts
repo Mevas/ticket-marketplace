@@ -3,7 +3,7 @@ import { useRecoilState } from "recoil";
 import { useTicketContract } from "./use-ticket-contract";
 import { balanceState } from "../recoil/atoms/balance";
 import { useAccount, useSigner } from "wagmi";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 export const useBalance = () => {
   const contract = useTicketContract();
@@ -24,7 +24,9 @@ export const useBalance = () => {
       }
 
       const connection = await contract.connect(account.address);
-      const balance = (await connection.totalSupply(id)).toNumber();
+      const balance = (
+        await connection.balanceOf(account.address, id)
+      ).toNumber();
 
       setBalance((balances) => ({
         ...balances,
@@ -33,6 +35,15 @@ export const useBalance = () => {
     },
     [account?.address, contract, setBalance, signer]
   );
+
+  useEffect(() => {
+    if (!signer) {
+      return;
+    }
+
+    (async () =>
+      await Promise.all([1, 2].map(async (id) => await getBalance(id))))();
+  }, [signer]);
 
   return useMemo(() => ({ balance, getBalance }), [balance, getBalance]);
 };

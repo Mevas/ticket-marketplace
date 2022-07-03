@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Button, Text } from "@nextui-org/react";
 import {
   useAccount,
@@ -20,20 +20,6 @@ export const Account = () => {
 
   const contract = useTicketContract();
   const { balance, getBalance } = useBalance();
-
-  useEffect(() => {
-    (async () => {
-      await getBalance(1);
-    })();
-  }, [getBalance]);
-
-  // useEffect(() => {
-  //   // if (!signer || !account.address) {
-  //   //   return;
-  //   // }
-  //
-  //   contract.balanceOf(account.address).then((r) => console.log(r));
-  // }, [contract]);
 
   if (!account?.address) {
     return (
