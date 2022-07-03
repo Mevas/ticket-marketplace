@@ -3,6 +3,7 @@ import { CssBaseline } from "@nextui-org/react";
 import React from "react";
 
 class MyDocument extends Document {
+  // @ts-ignore - for WebStorm
   static async getInitialProps(ctx) {
     const initialProps = await Document.getInitialProps(ctx);
     return {
