@@ -1,6 +1,6 @@
 import type { AppProps } from "next/app";
 import { NextUIProvider } from "@nextui-org/react";
-import { darkTheme, lightTheme } from "../../theme";
+import { darkTheme, lightTheme } from "../theme";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { RecoilRoot } from "recoil";
 
