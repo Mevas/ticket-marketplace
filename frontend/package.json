@@ -15,8 +15,11 @@
     "next-themes": "^0.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.34.0",
+    "react-use": "^17.4.0",
     "recoil": "^0.7.3",
-    "wagmi": "^0.4.12"
+    "wagmi": "^0.4.12",
+    "web3-token": "^0.2.9"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",

@@ -1,8 +1,8 @@
 import { BigNumberish, utils } from "ethers";
 import { useQuery } from "react-query";
-import axios from "axios";
 import { useTicketContract } from "./use-ticket-contract";
 import { useSigner } from "wagmi";
+import { axiosInstance } from "../utils/auth";
 
 export const useTicket = (id: BigNumberish) => {
   const contract = useTicketContract();
@@ -12,7 +12,7 @@ export const useTicket = (id: BigNumberish) => {
     ["ticket"],
     async () => {
       return (
-        await axios.get(
+        await axiosInstance.get(
           (
             await contract.uri(id)
           ).replace(

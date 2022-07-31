@@ -34,4 +34,8 @@ contract Ticket is ERC1155, Ownable, ERC1155Supply {
     {
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
+
+    function testView() public pure returns(int) {
+        return 7;
+    }
 }

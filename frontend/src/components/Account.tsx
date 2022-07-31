@@ -6,12 +6,12 @@ import {
   useDisconnect,
   useEnsAvatar,
   useEnsName,
-  useSigner,
 } from "wagmi";
 import { Box } from "./Box";
 import { useTicketContract } from "../hooks/use-ticket-contract";
 import { useBalance } from "../hooks/use-balance";
 import { useTicket } from "../hooks/use-ticket";
+import { AuthButton } from "./AuthButton";
 
 export const Account = () => {
   const { data: account } = useAccount();
@@ -67,6 +67,17 @@ export const Account = () => {
       >
         Mint
       </Button>
+
+      <Button
+        onClick={async () => {
+          const test = await contract.testView();
+          console.log(test);
+        }}
+      >
+        Test view
+      </Button>
+
+      <AuthButton />
 
       {Object.entries(balance).map(([id, value]) => {
         return (
