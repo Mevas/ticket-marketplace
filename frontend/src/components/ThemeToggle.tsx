@@ -29,6 +29,7 @@ export const ThemeToggle = () => {
           px: "$2",
         },
         m: 0,
+        minWidth: 40,
       }}
     >
       {isDark ? (
