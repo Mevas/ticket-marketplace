@@ -1,11 +1,10 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { User } from '@prisma/client';
 import * as Web3Token from 'web3-token';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -29,22 +28,24 @@ export class AuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
 
-    let user: User;
+    let address: string;
     try {
-      const { address } = Web3Token.verify(request.headers['authorization']);
-
-      user = await this.prisma.user.findUnique({
-        where: {
-          walletAddress: address,
-        },
-      });
+      ({ address } = Web3Token.verify(request.headers['authorization']));
     } catch (e) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(e.message);
     }
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        walletAddress: address,
+      },
+    });
 
     if (user === null) {
       throw new UnauthorizedException('Please create a user');
     }
+
+    request;
 
     return true;
   }

@@ -5,7 +5,7 @@ import { FormInput } from "./forms/FormInput";
 import { useForm } from "react-hook-form";
 import { useUser } from "../hooks/useUser";
 import { useMutation } from "react-query";
-import { axiosInstance } from "../utils/auth";
+import { axiosInstance, deleteAuthToken } from "../utils/auth";
 
 type AuthFormParams = {
   email: string;
@@ -29,6 +29,19 @@ export const AuthButton = () => {
   useEffect(() => {
     closeHandler();
   }, [createAccount.isSuccess]);
+
+  const handleLogin = async () => {
+    const response = await user.logIn();
+
+    if (response?.error?.response?.data.message === "Please create a user") {
+      setVisible(true);
+    }
+
+    if (response?.error?.response?.data.message === "Token expired") {
+      deleteAuthToken();
+      await handleLogin();
+    }
+  };
 
   return (
     <div>
@@ -71,19 +84,7 @@ export const AuthButton = () => {
       </Modal>
 
       {!user.isLoggedIn || !user.meQuery.data?.email ? (
-        <Button
-          onClick={async () => {
-            const response = await user.logIn();
-
-            if (
-              response?.error?.response?.data.message === "Please create a user"
-            ) {
-              setVisible(true);
-            }
-          }}
-        >
-          Log in
-        </Button>
+        <Button onClick={handleLogin}>Log in</Button>
       ) : (
         <Button
           onClick={async () => {
