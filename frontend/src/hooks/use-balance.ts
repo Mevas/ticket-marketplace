@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo } from "react";
 export const useBalance = () => {
   const contract = useTicketContract();
   const [balance, setBalance] = useRecoilState(balanceState);
-  const { data: account } = useAccount();
+  const account = useAccount();
   const { data: signer } = useSigner();
 
   const getBalance = useCallback(

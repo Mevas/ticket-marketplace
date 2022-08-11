@@ -14,7 +14,7 @@ import { useTicket } from "../hooks/use-ticket";
 import { AuthButton } from "./AuthButton";
 
 export const Account = () => {
-  const { data: account } = useAccount();
+  const account = useAccount();
   const { data: ensAvatar } = useEnsAvatar({ addressOrName: account?.address });
   const { data: ensName } = useEnsName({ address: account?.address });
   const { connect, connectors } = useConnect();
@@ -28,9 +28,11 @@ export const Account = () => {
   const { data: ticket } = useTicket(1);
   console.log(ticket);
 
-  if (!account?.address) {
+  if (!account.address) {
     return (
-      <Button onClick={() => connect(connectors[0])}>Connect MetaMask</Button>
+      <Button onClick={() => connect({ connector: connectors[0] })}>
+        Connect MetaMask
+      </Button>
     );
   }
 

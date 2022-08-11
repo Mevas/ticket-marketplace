@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { AxiosError } from "axios";
 import { useSigner } from "wagmi";
 import {
@@ -15,6 +15,7 @@ export const useUser = () => {
   const rerender = useUpdate();
 
   const isLoggedIn = !!getAuthToken();
+  const queryClient = useQueryClient();
 
   const meQuery = useQuery<
     {
@@ -28,6 +29,9 @@ export const useUser = () => {
     },
     {
       enabled: isLoggedIn,
+      onError: () => {
+        queryClient.removeQueries(["me"]);
+      },
     }
   );
 

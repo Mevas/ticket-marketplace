@@ -4,11 +4,19 @@ import { darkTheme, lightTheme } from "../theme";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { RecoilRoot } from "recoil";
 
-import { createClient, WagmiConfig } from "wagmi";
+import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { Layout } from "../components/Layout";
+import { publicProvider } from "wagmi/providers/public";
+
+const { provider, webSocketProvider } = configureChains(
+  [chain.mainnet, chain.polygon],
+  [publicProvider()]
+);
 
 const client = createClient({
   autoConnect: true,
+  provider,
+  webSocketProvider,
 });
 
 const MyApp = ({ Component, pageProps }: AppProps) => (
