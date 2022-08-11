@@ -11,7 +11,7 @@ export type ButtonProps = NextButtonProps & {
 
 export const Button = ({ loading, children, ...props }: ButtonProps) => {
   return (
-    <NextButton {...props}>
+    <NextButton {...props} disabled={!!loading}>
       {loading ? (
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <Loading type="spinner" color="currentColor" />
