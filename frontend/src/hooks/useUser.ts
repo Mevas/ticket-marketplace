@@ -46,9 +46,19 @@ export const useUser = () => {
 
     if (!token) {
       setIsLoggingIn(true);
-      setToken(
-        await Web3Token.sign(async (msg) => await signer.signMessage(msg), "1d")
-      );
+      try {
+        setToken(
+          await Web3Token.sign(
+            async (msg) => await signer.signMessage(msg),
+            "1d"
+          )
+        );
+      } catch (e) {
+        if (e instanceof Error) {
+          console.error(e);
+          setIsLoggingIn(false);
+        }
+      }
     }
 
     const response = await meQuery.refetch();
