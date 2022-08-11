@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Container, Row, Text } from "@nextui-org/react";
 import { ThemeToggle } from "./ThemeToggle";
+import Link from "next/link";
 
 export const Navbar = () => {
   return (
@@ -9,7 +10,10 @@ export const Navbar = () => {
         <Text h1>TicketMart</Text>
 
         <div style={{ display: "flex", gap: "32px" }}>
-          <Button>Create event</Button>
+          <Link href="/events/new">
+            <Button>Create event</Button>
+          </Link>
+
           <ThemeToggle />
         </div>
       </Row>

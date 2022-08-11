@@ -5,8 +5,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import * as Web3Token from 'web3-token';
 import { PrismaService } from '../prisma/prisma.service';
+import { getWalletAddress } from '../utils';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -26,26 +27,29 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<Request>();
 
-    let address: string;
-    try {
-      ({ address } = Web3Token.verify(request.headers['authorization']));
-    } catch (e) {
-      throw new UnauthorizedException(e.message);
+    if (!request.headers.authorization) {
+      throw new UnauthorizedException('Missing auth token');
     }
 
+    // Verify that it is a valid web3 token
+    const address = getWalletAddress(request.headers.authorization);
+
+    // Check to see if the wallet address is associated with a centralized user
     const user = await this.prisma.user.findUnique({
       where: {
         walletAddress: address,
       },
     });
 
+    // If not, the user should sign up (automatically handled on the frontend)
     if (user === null) {
       throw new UnauthorizedException('Please create a user');
     }
 
-    request;
+    // Set the user in the request context for further usage in utility decorators
+    request.user = user;
 
     return true;
   }
