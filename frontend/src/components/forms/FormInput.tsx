@@ -19,12 +19,12 @@ export const FormInput = ({ name, ...props }: FormInputProps) => {
       control={control}
       render={(controllerProps) => (
         <Input
-          {...props}
           clearable
           bordered
           fullWidth
           color="primary"
           size="lg"
+          {...props}
           {...controllerProps.field}
         />
       )}
