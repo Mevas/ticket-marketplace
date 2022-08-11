@@ -78,7 +78,7 @@ export const AuthButton = () => {
               ) : (
                 "Create account"
               )}
-            </Button>{" "}
+            </Button>
           </Modal.Footer>
         </Form>
       </Modal>

@@ -1,12 +1,6 @@
 import React, { useState } from "react";
-import { Button, Loading, Text } from "@nextui-org/react";
-import {
-  useAccount,
-  useConnect,
-  useDisconnect,
-  useEnsAvatar,
-  useEnsName,
-} from "wagmi";
+import { Button, Loading } from "@nextui-org/react";
+import { useAccount } from "wagmi";
 import { Box } from "./Box";
 import { useTicketContract } from "../hooks/use-ticket-contract";
 import { useBalance } from "../hooks/use-balance";
@@ -15,11 +9,6 @@ import { AuthButton } from "./AuthButton";
 
 export const Account = () => {
   const account = useAccount();
-  const { data: ensAvatar } = useEnsAvatar({ addressOrName: account?.address });
-  const { data: ensName } = useEnsName({ address: account?.address });
-  const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
-
   const contract = useTicketContract();
   const { balance, getBalance } = useBalance();
 
@@ -28,35 +17,18 @@ export const Account = () => {
   const { data: ticket } = useTicket(1);
   console.log(ticket);
 
-  if (!account.address) {
-    return (
-      <Button onClick={() => connect({ connector: connectors[0] })}>
-        Connect MetaMask
-      </Button>
-    );
-  }
-
   if (loading) {
     return <Loading size="xl">{loading}</Loading>;
+  }
+
+  if (!account.address) {
+    return null;
   }
 
   const address = account.address;
 
   return (
     <Box>
-      <Box
-        css={{
-          background: "$accents1",
-          p: "$sm",
-          borderRadius: "$md",
-        }}
-      >
-        {ensAvatar && <img src={ensAvatar} alt="ENS Avatar" />}
-        <Text>{ensName ? `${ensName} (${address})` : address}</Text>
-        <Text>Connected to {account.connector?.name}</Text>
-        <Button onClick={() => disconnect()}>Disconnect</Button>
-      </Box>
-
       <Button
         onClick={async () => {
           setLoading("Transacting...");

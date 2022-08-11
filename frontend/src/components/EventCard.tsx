@@ -16,7 +16,9 @@ export const EventCard = ({ event }: EventCardProps) => {
     <Card isHoverable isPressable>
       <Card.Header css={{ position: "absolute", zIndex: 1, top: 5 }}>
         <Col>
-          <Text h3>{event.title}</Text>
+          <Text h3 color="white">
+            {event.title}
+          </Text>
 
           <Text size={12} weight="bold" transform="uppercase" color="#222222DD">
             {event.description}
