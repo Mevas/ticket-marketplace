@@ -59,5 +59,5 @@ export const useUser = () => {
     rerender();
   };
 
-  return { logIn, logOut, isLoggedIn, meQuery };
+  return { logIn, logOut, isLoggedIn, ...meQuery.data };
 };

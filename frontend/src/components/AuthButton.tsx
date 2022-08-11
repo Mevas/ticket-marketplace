@@ -83,7 +83,7 @@ export const AuthButton = () => {
         </Form>
       </Modal>
 
-      {!user.isLoggedIn || !user.meQuery.data?.email ? (
+      {!user.isLoggedIn || !user.email ? (
         <Button onClick={handleLogin}>Log in</Button>
       ) : (
         <Button
