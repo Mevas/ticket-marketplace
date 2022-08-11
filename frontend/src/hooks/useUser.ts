@@ -54,7 +54,7 @@ export const useUser = () => {
     return response;
   };
 
-  const logOut = async () => {
+  const logOut = () => {
     deleteAuthToken();
     rerender();
   };

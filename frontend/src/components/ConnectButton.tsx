@@ -12,6 +12,7 @@ import {
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { EnsAvatar } from "./EnsAvatar";
 import { EnsName } from "./EnsName";
+import { useUser } from "../hooks/useUser";
 
 export const ConnectButton = () => {
   const account = useAccount();
@@ -22,6 +23,7 @@ export const ConnectButton = () => {
     },
   });
   const { disconnect } = useDisconnect();
+  const user = useUser();
 
   const handleConnect = () => {
     connect({ connector: connectors[0] });
@@ -126,6 +128,7 @@ export const ConnectButton = () => {
                     onClick={() => {
                       setInfoVisible(false);
                       disconnect();
+                      user.logOut();
                     }}
                   >
                     Disconnect
