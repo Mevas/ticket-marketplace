@@ -1,22 +1,23 @@
 import { useQuery, useQueryClient } from "react-query";
 import { AxiosError } from "axios";
 import { useSigner } from "wagmi";
-import {
-  axiosInstance,
-  deleteAuthToken,
-  getAuthToken,
-  setAuthToken,
-} from "../utils/auth";
+import { axiosInstance } from "../utils/auth";
 import * as Web3Token from "web3-token";
-import { useUpdate } from "react-use";
+import { useLocalStorage } from "react-use";
 import { User } from "../types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilState } from "recoil";
+import { isLoggedInAtom } from "../recoil/atoms/is-logged-in";
 
 export const useUser = () => {
   const { data: signer } = useSigner();
-  const rerender = useUpdate();
-
-  const isLoggedIn = !!getAuthToken();
+  const [token, setToken, removeToken] = useLocalStorage<string>(
+    "auth-token",
+    undefined,
+    { raw: true }
+  );
   const queryClient = useQueryClient();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const meQuery = useQuery<User, AxiosError>(
     ["me"],
@@ -24,40 +25,54 @@ export const useUser = () => {
       return (await axiosInstance.get("users/me")).data;
     },
     {
-      enabled: isLoggedIn,
+      enabled: !!token,
       onError: () => {
         queryClient.removeQueries(["me"]);
       },
     }
   );
 
-  const logIn = async () => {
+  const [isLoggedIn, setIsLoggedIn] = useRecoilState(isLoggedInAtom);
+
+  useEffect(() => {
+    setIsLoggedIn(!!meQuery.data?.email);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [meQuery.data?.email]);
+
+  const logIn = useCallback(async () => {
     if (!signer) {
       return;
     }
 
-    let token = getAuthToken();
-
     if (!token) {
-      token = await Web3Token.sign(
-        async (msg) => await signer.signMessage(msg),
-        "1d"
+      setIsLoggingIn(true);
+      setToken(
+        await Web3Token.sign(async (msg) => await signer.signMessage(msg), "1d")
       );
     }
 
-    setAuthToken(token);
-
     const response = await meQuery.refetch();
 
-    rerender();
+    setIsLoggingIn(false);
 
     return response;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setToken, signer, token]);
 
-  const logOut = () => {
-    deleteAuthToken();
-    rerender();
-  };
+  const logOut = useCallback(() => {
+    queryClient.removeQueries(["me"]);
+    removeToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  return { logIn, logOut, isLoggedIn, ...meQuery.data };
+  return useMemo(
+    () => ({
+      logIn,
+      logOut,
+      isLoggedIn,
+      isLoggingIn,
+      ...meQuery.data,
+    }),
+    [isLoggedIn, isLoggingIn, logIn, logOut, meQuery.data]
+  );
 };
