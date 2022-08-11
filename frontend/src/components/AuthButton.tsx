@@ -1,6 +1,6 @@
 import React from "react";
 import { Form } from "./forms/Form";
-import { Button, Loading, Modal, Text } from "@nextui-org/react";
+import { Loading, Modal, Text } from "@nextui-org/react";
 import { FormInput } from "./forms/FormInput";
 import { useForm } from "react-hook-form";
 import { useUser } from "../hooks/useUser";
@@ -9,6 +9,7 @@ import { axiosInstance } from "../utils/auth";
 import { useLocalStorage } from "react-use";
 import { AxiosError } from "axios";
 import { User } from "../types";
+import { Button } from "./Button";
 
 type AuthFormParams = {
   email: string;
@@ -47,7 +48,7 @@ export const AuthButton = () => {
   };
 
   return (
-    <div>
+    <>
       <Modal
         closeButton
         aria-labelledby="modal-title"
@@ -86,11 +87,14 @@ export const AuthButton = () => {
         </Form>
       </Modal>
 
-      {!user.isLoggedIn || !user.email ? (
-        <Button onClick={handleLogin}>Log in</Button>
-      ) : (
-        <Button onClick={user.logOut}>Log out</Button>
-      )}
-    </div>
+      <Button
+        size="lg"
+        css={{ width: "100%" }}
+        onClick={handleLogin}
+        loading={user.isLoggingIn && "Awaiting signature..."}
+      >
+        Log in
+      </Button>
+    </>
   );
 };

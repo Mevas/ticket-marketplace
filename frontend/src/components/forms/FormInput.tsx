@@ -11,7 +11,7 @@ export type FormInputProps = SharedFieldProps & Partial<InputProps>;
  * Must be wrapped with a {@link Form} component!
  */
 export const FormInput = ({ name, ...props }: FormInputProps) => {
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
 
   return (
     <Controller
@@ -26,6 +26,7 @@ export const FormInput = ({ name, ...props }: FormInputProps) => {
           size="lg"
           {...props}
           {...controllerProps.field}
+          value={controllerProps.field.value ?? getValues(name)}
         />
       )}
     />

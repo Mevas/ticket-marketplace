@@ -18,6 +18,7 @@ import { Form } from "./forms/Form";
 import { useForm } from "react-hook-form";
 import { User } from "../types";
 import { Button } from "./Button";
+import { AuthButton } from "./AuthButton";
 
 export const ConnectButton = () => {
   const account = useAccount();
@@ -182,8 +183,7 @@ export const ConnectButton = () => {
               <Card variant="bordered" css={{ background: "$accents1" }}>
                 <Form methods={methods}>
                   <Card.Header>
-                    <Row justify="space-between">
-                      Logged in as {user.name}
+                    <Row justify="flex-end">
                       <div style={{ display: "flex", gap: 16 }}>
                         {editing ? (
                           <Button
@@ -261,16 +261,7 @@ export const ConnectButton = () => {
                 </Form>
               </Card>
             ) : (
-              <Button
-                size="lg"
-                css={{ width: "100%" }}
-                onClick={async () => {
-                  await user.logIn();
-                }}
-                loading={user.isLoggingIn && "Awaiting signature..."}
-              >
-                Log in
-              </Button>
+              <AuthButton />
             )}
           </Modal.Body>
         </Modal>
