@@ -1,9 +1,10 @@
 import type { NextPage } from "next";
 import { Container } from "@nextui-org/react";
 import dynamic from "next/dynamic";
-import { dehydrate, QueryClient, useQuery } from "react-query";
-import { axiosInstance } from "../utils/auth";
+import { dehydrate, QueryClient } from "react-query";
 import { Box } from "../components/Box";
+import { useEvents } from "../hooks/use-events";
+import { getEvents } from "../utils/api";
 
 const Account = dynamic<{}>(
   () => import("../components/Account").then((mod) => mod.Account),
@@ -15,7 +16,7 @@ const getEvents = async () => {
 };
 
 const Home: NextPage = () => {
-  const { data } = useQuery<{ title: string }[]>(["events"], getEvents);
+  const { data } = useEvents();
 
   return (
     <Container

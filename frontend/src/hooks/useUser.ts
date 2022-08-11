@@ -9,6 +9,7 @@ import {
 } from "../utils/auth";
 import * as Web3Token from "web3-token";
 import { useUpdate } from "react-use";
+import { User } from "../types";
 
 export const useUser = () => {
   const { data: signer } = useSigner();
@@ -17,12 +18,7 @@ export const useUser = () => {
   const isLoggedIn = !!getAuthToken();
   const queryClient = useQueryClient();
 
-  const meQuery = useQuery<
-    {
-      email: string;
-    },
-    AxiosError
-  >(
+  const meQuery = useQuery<User, AxiosError>(
     ["me"],
     async () => {
       return (await axiosInstance.get("users/me")).data;
