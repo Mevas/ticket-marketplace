@@ -225,9 +225,7 @@ export const ConnectButton = () => {
                             size="xs"
                             color="error"
                             bordered
-                            onClick={() => {
-                              user.logOut();
-                            }}
+                            onClick={user.logOut}
                           >
                             Log out
                           </Button>

@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 import { useSigner } from "wagmi";
 import { axiosInstance } from "../utils/auth";
 import * as Web3Token from "web3-token";
-import { useLocalStorage } from "react-use";
+import { useLocalStorage, useUpdate } from "react-use";
 import { User } from "../types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilState } from "recoil";
@@ -16,6 +16,7 @@ export const useUser = () => {
     undefined,
     { raw: true }
   );
+  const rerender = useUpdate();
   const queryClient = useQueryClient();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -72,6 +73,7 @@ export const useUser = () => {
   const logOut = useCallback(() => {
     queryClient.removeQueries(["me"]);
     removeToken();
+    rerender();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
