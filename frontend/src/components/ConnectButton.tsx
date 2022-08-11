@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Button,
   Card,
   Col,
   Loading,
@@ -13,6 +12,12 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { EnsAvatar } from "./EnsAvatar";
 import { EnsName } from "./EnsName";
 import { useUser } from "../hooks/useUser";
+import { Box } from "./Box";
+import { FormInput } from "./forms/FormInput";
+import { Form } from "./forms/Form";
+import { useForm } from "react-hook-form";
+import { User } from "../types";
+import { Button } from "./Button";
 
 export const ConnectButton = () => {
   const account = useAccount();
@@ -29,27 +34,47 @@ export const ConnectButton = () => {
     connect({ connector: connectors[0] });
   };
 
+  const methods = useForm<Pick<User, "email" | "name">>({
+    defaultValues: user,
+    shouldUnregister: true,
+  });
+  const { reset } = methods;
+
+  useEffect(() => {
+    reset(user);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const [editing, setEditing] = useState(false);
+
   return (
     <>
       {account.isConnected && account.address ? (
         <Button
-          flat
           auto
           rounded
           bordered
           onClick={() => setInfoVisible(true)}
           css={{ position: "relative" }}
         >
-          <div style={{ paddingRight: 20 }}>
-            <EnsName />
-          </div>
+          <Row style={{ paddingRight: 20 }}>
+            <>
+              {user.isLoggedIn && (
+                <>
+                  {user.name}
+                  <Box css={{ px: 10, scale: 2 }}>·</Box>
+                </>
+              )}
+              <EnsName />
+            </>
+          </Row>
 
           <div style={{ position: "absolute", right: 10 }}>
             <EnsAvatar size="xs" css={{ cursor: "pointer" }} />
           </div>
         </Button>
       ) : (
-        <Button flat auto rounded bordered onClick={handleConnect}>
+        <Button auto rounded bordered onClick={handleConnect}>
           Connect wallet
         </Button>
       )}
@@ -63,6 +88,7 @@ export const ConnectButton = () => {
           onClose={() => {
             connection.reset();
           }}
+          preventClose={connection.isLoading}
         >
           {connection.isError ? (
             <>
@@ -108,7 +134,10 @@ export const ConnectButton = () => {
           closeButton
           aria-labelledby="modal-title"
           open={infoVisible}
-          onClose={() => setInfoVisible(false)}
+          onClose={() => {
+            setInfoVisible(false);
+            setEditing(false);
+          }}
         >
           <Modal.Header css={{ position: "absolute", top: 0 }}>
             <Text size={16} transform="uppercase">
@@ -117,7 +146,7 @@ export const ConnectButton = () => {
           </Modal.Header>
 
           <Modal.Body css={{ mb: "$sm", mt: "$lg" }}>
-            <Card variant="bordered">
+            <Card variant="bordered" css={{ background: "$accents1" }}>
               <Card.Header>
                 <Row justify="space-between">
                   Connected with {account.connector?.name}
@@ -148,6 +177,101 @@ export const ConnectButton = () => {
                 </Row>
               </Card.Body>
             </Card>
+
+            {user.isLoggedIn ? (
+              <Card variant="bordered" css={{ background: "$accents1" }}>
+                <Form methods={methods}>
+                  <Card.Header>
+                    <Row justify="space-between">
+                      Logged in as {user.name}
+                      <div style={{ display: "flex", gap: 16 }}>
+                        {editing ? (
+                          <Button
+                            size="xs"
+                            color="success"
+                            bordered
+                            onClick={() => {
+                              setEditing(false);
+                            }}
+                          >
+                            Save
+                          </Button>
+                        ) : (
+                          <Button
+                            size="xs"
+                            color="primary"
+                            bordered
+                            onClick={() => {
+                              setEditing(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                        )}
+
+                        {editing ? (
+                          <Button
+                            size="xs"
+                            color="error"
+                            bordered
+                            onClick={() => {
+                              setEditing(false);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        ) : (
+                          <Button
+                            size="xs"
+                            color="error"
+                            bordered
+                            onClick={() => {
+                              user.logOut();
+                            }}
+                          >
+                            Log out
+                          </Button>
+                        )}
+                      </div>
+                    </Row>
+                  </Card.Header>
+
+                  <Card.Divider />
+
+                  <Card.Body>
+                    <div style={{ display: "grid", gap: 40, marginTop: 16 }}>
+                      <FormInput
+                        labelPlaceholder="Email"
+                        name="email"
+                        required
+                        readOnly={!editing}
+                        clearable={editing}
+                        bordered={editing}
+                      />
+                      <FormInput
+                        labelPlaceholder="Name"
+                        name="name"
+                        required
+                        readOnly={!editing}
+                        clearable={editing}
+                        bordered={editing}
+                      />
+                    </div>
+                  </Card.Body>
+                </Form>
+              </Card>
+            ) : (
+              <Button
+                size="lg"
+                css={{ width: "100%" }}
+                onClick={async () => {
+                  await user.logIn();
+                }}
+                loading={user.isLoggingIn && "Awaiting signature..."}
+              >
+                Log in
+              </Button>
+            )}
           </Modal.Body>
         </Modal>
       )}
