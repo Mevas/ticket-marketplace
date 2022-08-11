@@ -11,3 +11,11 @@ export type User = {
   email: string;
   walletAddress: string;
 };
+
+export type PrismaError<T extends string = string> = {
+  code: string;
+  clientVersion: string;
+  meta: {
+    target: T[];
+  };
+};

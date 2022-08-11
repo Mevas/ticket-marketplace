@@ -11,7 +11,9 @@ export type FormInputProps = SharedFieldProps & Partial<InputProps>;
  * Must be wrapped with a {@link Form} component!
  */
 export const FormInput = ({ name, ...props }: FormInputProps) => {
-  const { control, getValues } = useFormContext();
+  const { control, getValues, formState } = useFormContext();
+
+  const isErrored = !!formState.errors[name];
 
   return (
     <Controller
@@ -23,9 +25,11 @@ export const FormInput = ({ name, ...props }: FormInputProps) => {
           bordered
           fullWidth
           color="primary"
+          status={isErrored ? "error" : undefined}
           size="lg"
           {...props}
           {...controllerProps.field}
+          // getValues is needed as a hack to circumvent the controller not updating correctly for some reason
           value={controllerProps.field.value ?? getValues(name)}
         />
       )}

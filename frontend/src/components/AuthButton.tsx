@@ -1,6 +1,6 @@
 import React from "react";
 import { Form } from "./forms/Form";
-import { Loading, Modal, Text } from "@nextui-org/react";
+import { Modal, Text } from "@nextui-org/react";
 import { FormInput } from "./forms/FormInput";
 import { useForm } from "react-hook-form";
 import { useUser } from "../hooks/useUser";
@@ -8,7 +8,7 @@ import { useMutation } from "react-query";
 import { axiosInstance } from "../utils/auth";
 import { useLocalStorage } from "react-use";
 import { AxiosError } from "axios";
-import { User } from "../types";
+import { PrismaError, User } from "../types";
 import { Button } from "./Button";
 
 type AuthFormParams = {
@@ -23,14 +23,36 @@ export const AuthButton = () => {
   const [, , removeToken] = useLocalStorage("auth-token");
 
   const methods = useForm<AuthFormParams>();
-  const { handleSubmit } = methods;
+  const { handleSubmit, setError } = methods;
 
-  const createAccount = useMutation<User, AxiosError, AuthFormParams>(
+  const createAccount = useMutation<
+    User,
+    AxiosError<PrismaError<keyof AuthFormParams>>,
+    AuthFormParams
+  >(
     async (data) => {
       return (await axiosInstance.post("users", data)).data;
     },
     {
       onSuccess: closeHandler,
+      onError: (error) => {
+        const e = error.response?.data;
+
+        switch (e?.code) {
+          // Duplicate field
+          case "P2002": {
+            e.meta.target.forEach((field) => {
+              setError(field, {
+                message: `${field} already exists`,
+              });
+            });
+            break;
+          }
+          default: {
+            console.warn(`Error ${e?.code} not handled`, e);
+          }
+        }
+      },
     }
   );
 
@@ -76,12 +98,12 @@ export const AuthButton = () => {
             <Button auto flat color="error" onClick={closeHandler}>
               Close
             </Button>
-            <Button css={{ minWidth: 130 }} type="submit">
-              {createAccount.isLoading ? (
-                <Loading type="spinner" color="currentColor" size="sm" />
-              ) : (
-                "Create account"
-              )}
+            <Button
+              css={{ minWidth: 130 }}
+              type="submit"
+              loading={createAccount.isLoading}
+            >
+              Create account
             </Button>
           </Modal.Footer>
         </Form>

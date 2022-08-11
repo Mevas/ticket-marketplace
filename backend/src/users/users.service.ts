@@ -1,19 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto, walletAddress: string) {
-    return await this.prisma.user.create({
-      data: {
-        ...createUserDto,
-        walletAddress,
-      },
-    });
+    try {
+      return await this.prisma.user.create({
+        data: {
+          ...createUserDto,
+          walletAddress,
+        },
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new BadRequestException({ ...e });
+      }
+    }
   }
 
   findAll() {
