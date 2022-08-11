@@ -1,11 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Form } from "./forms/Form";
 import { Button, Loading, Modal, Text } from "@nextui-org/react";
 import { FormInput } from "./forms/FormInput";
 import { useForm } from "react-hook-form";
 import { useUser } from "../hooks/useUser";
 import { useMutation } from "react-query";
-import { axiosInstance, deleteAuthToken } from "../utils/auth";
+import { axiosInstance } from "../utils/auth";
+import { useLocalStorage } from "react-use";
+import { AxiosError } from "axios";
+import { User } from "../types";
 
 type AuthFormParams = {
   email: string;
@@ -16,19 +19,19 @@ export const AuthButton = () => {
   const [visible, setVisible] = React.useState(false);
   const closeHandler = () => setVisible(false);
   const user = useUser();
+  const [, , removeToken] = useLocalStorage("auth-token");
 
   const methods = useForm<AuthFormParams>();
   const { handleSubmit } = methods;
 
-  const createAccount = useMutation<unknown, any, AuthFormParams>(
+  const createAccount = useMutation<User, AxiosError, AuthFormParams>(
     async (data) => {
       return (await axiosInstance.post("users", data)).data;
+    },
+    {
+      onSuccess: closeHandler,
     }
   );
-
-  useEffect(() => {
-    closeHandler();
-  }, [createAccount.isSuccess]);
 
   const handleLogin = async () => {
     const response = await user.logIn();
@@ -38,7 +41,7 @@ export const AuthButton = () => {
     }
 
     if (response?.error?.response?.data.message === "Token expired") {
-      deleteAuthToken();
+      removeToken();
       await handleLogin();
     }
   };
@@ -86,13 +89,7 @@ export const AuthButton = () => {
       {!user.isLoggedIn || !user.email ? (
         <Button onClick={handleLogin}>Log in</Button>
       ) : (
-        <Button
-          onClick={async () => {
-            await user.logOut();
-          }}
-        >
-          Log out
-        </Button>
+        <Button onClick={user.logOut}>Log out</Button>
       )}
     </div>
   );
