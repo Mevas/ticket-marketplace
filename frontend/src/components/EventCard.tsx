@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Card, Col, Row, Text } from "@nextui-org/react";
 import { Event } from "../types";
 import { useUser } from "../hooks/useUser";
+import Link from "next/link";
 
 export type EventCardProps = {
   event: Event;
@@ -49,16 +50,18 @@ export const EventCard = ({ event }: EventCardProps) => {
         <Col>
           <Row justify="flex-end">
             {isOrganizer ? (
-              <Button flat auto rounded color="primary">
-                <Text
-                  css={{ color: "inherit" }}
-                  size={12}
-                  weight="bold"
-                  transform="uppercase"
-                >
-                  Manage
-                </Text>
-              </Button>
+              <Link href={`/events/${event.id}`}>
+                <Button flat auto rounded color="primary">
+                  <Text
+                    css={{ color: "inherit" }}
+                    size={12}
+                    weight="bold"
+                    transform="uppercase"
+                  >
+                    Manage
+                  </Text>
+                </Button>
+              </Link>
             ) : (
               <Button flat auto rounded color="secondary">
                 <Text

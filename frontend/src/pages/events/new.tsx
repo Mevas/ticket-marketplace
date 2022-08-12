@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Container, Loading, Text } from "@nextui-org/react";
+import { Button, Loading, Text } from "@nextui-org/react";
 import { Box } from "../../components/Box";
 import { Form } from "../../components/forms/Form";
 import { FormInput } from "../../components/forms/FormInput";
@@ -40,43 +40,41 @@ const CreateEvent = () => {
   );
 
   return (
-    <Container display="flex" justify="center" css={{ mt: "$xl" }}>
-      <Box
-        css={{
-          backgroundColor: "$accents0",
-          borderRadius: 16,
-          display: "flex",
-          justifyContent: "center",
-          padding: "$6",
-        }}
+    <Box
+      css={{
+        backgroundColor: "$accents0",
+        borderRadius: 16,
+        display: "flex",
+        justifyContent: "center",
+        padding: "$6",
+      }}
+    >
+      <Text size="$xl4">Create a new event</Text>
+
+      <Form
+        onSubmit={handleSubmit(async (values) => {
+          createEvent.mutate(values);
+        })}
+        methods={methods}
       >
-        <Text size="$xl4">Create a new event</Text>
+        <FormInput placeholder="Title" name="title" required />
+        {/*<FormInput placeholder="Name" name="name" required />*/}
 
-        <Form
-          onSubmit={handleSubmit(async (values) => {
-            createEvent.mutate(values);
-          })}
-          methods={methods}
-        >
-          <FormInput placeholder="Title" name="title" required />
-          {/*<FormInput placeholder="Name" name="name" required />*/}
-
-          <Link href="/events/new">
-            <Button auto flat color="error">
-              Cancel
-            </Button>
-          </Link>
-
-          <Button css={{ minWidth: 130 }} type="submit">
-            {createEvent.isLoading ? (
-              <Loading type="spinner" color="currentColor" size="sm" />
-            ) : (
-              "Create event"
-            )}
+        <Link href="/events/new">
+          <Button auto flat color="error">
+            Cancel
           </Button>
-        </Form>
-      </Box>
-    </Container>
+        </Link>
+
+        <Button css={{ minWidth: 130 }} type="submit">
+          {createEvent.isLoading ? (
+            <Loading type="spinner" color="currentColor" size="sm" />
+          ) : (
+            "Create event"
+          )}
+        </Button>
+      </Form>
+    </Box>
   );
 };
 

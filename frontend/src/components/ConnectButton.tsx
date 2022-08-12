@@ -59,9 +59,7 @@ export const ConnectButton = () => {
     },
     {
       onSuccess: (newUser) => {
-        queryClient.setQueryData<User>(["me"], (): User | undefined => {
-          return newUser;
-        });
+        queryClient.setQueryData<User>(["me"], () => newUser);
 
         setEditing(false);
       },
