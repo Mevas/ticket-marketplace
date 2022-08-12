@@ -16,9 +16,10 @@ import { Box } from "./Box";
 import { FormInput } from "./forms/FormInput";
 import { Form } from "./forms/Form";
 import { useForm } from "react-hook-form";
-import { User } from "../types";
 import { Button } from "./Button";
 import { AuthButton } from "./AuthButton";
+import { AuthFormParams, authFormSchema } from "../utils/forms/authForm";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export const ConnectButton = () => {
   const account = useAccount();
@@ -35,11 +36,12 @@ export const ConnectButton = () => {
     connect({ connector: connectors[0] });
   };
 
-  const methods = useForm<Pick<User, "email" | "name">>({
+  const methods = useForm<AuthFormParams>({
     defaultValues: user,
     shouldUnregister: true,
+    resolver: zodResolver(authFormSchema),
   });
-  const { reset } = methods;
+  const { reset, handleSubmit } = methods;
 
   useEffect(() => {
     reset(user);
@@ -181,7 +183,13 @@ export const ConnectButton = () => {
 
             {user.isLoggedIn ? (
               <Card variant="bordered" css={{ background: "$accents1" }}>
-                <Form methods={methods}>
+                <Form
+                  methods={methods}
+                  onSubmit={handleSubmit((data) => {
+                    console.log(data);
+                    setEditing(false);
+                  })}
+                >
                   <Card.Header>
                     <Row justify="flex-end">
                       <div style={{ display: "flex", gap: 16 }}>
@@ -190,9 +198,8 @@ export const ConnectButton = () => {
                             size="xs"
                             color="success"
                             bordered
-                            onClick={() => {
-                              setEditing(false);
-                            }}
+                            type="submit"
+                            key="save"
                           >
                             Save
                           </Button>
@@ -201,9 +208,9 @@ export const ConnectButton = () => {
                             size="xs"
                             color="primary"
                             bordered
-                            onClick={() => {
-                              setEditing(true);
-                            }}
+                            type="button"
+                            onClick={() => setEditing(true)}
+                            key="edit"
                           >
                             Edit
                           </Button>
@@ -216,6 +223,7 @@ export const ConnectButton = () => {
                             bordered
                             onClick={() => {
                               setEditing(false);
+                              reset(user);
                             }}
                           >
                             Cancel
@@ -237,17 +245,26 @@ export const ConnectButton = () => {
                   <Card.Divider />
 
                   <Card.Body>
-                    <div style={{ display: "grid", gap: 40, marginTop: 16 }}>
+                    <div
+                      style={{
+                        display: "grid",
+                        gap: 24,
+                        marginBottom: 8,
+                      }}
+                    >
                       <FormInput
-                        labelPlaceholder="Email"
+                        label="Email"
+                        placeholder="johndoe@gmail.com"
                         name="email"
                         required
                         readOnly={!editing}
                         clearable={editing}
                         bordered={editing}
                       />
+
                       <FormInput
-                        labelPlaceholder="Name"
+                        label="Name"
+                        placeholder="John Doe"
                         name="name"
                         required
                         readOnly={!editing}

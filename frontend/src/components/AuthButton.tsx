@@ -3,6 +3,7 @@ import { Form } from "./forms/Form";
 import { Modal, Text } from "@nextui-org/react";
 import { FormInput } from "./forms/FormInput";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser } from "../hooks/useUser";
 import { useMutation } from "react-query";
 import { axiosInstance } from "../utils/auth";
@@ -10,11 +11,7 @@ import { useLocalStorage } from "react-use";
 import { AxiosError } from "axios";
 import { PrismaError, User } from "../types";
 import { Button } from "./Button";
-
-type AuthFormParams = {
-  email: string;
-  name: string;
-};
+import { AuthFormParams, authFormSchema } from "../utils/forms/authForm";
 
 export const AuthButton = () => {
   const [visible, setVisible] = React.useState(false);
@@ -22,7 +19,9 @@ export const AuthButton = () => {
   const user = useUser();
   const [, , removeToken] = useLocalStorage("auth-token");
 
-  const methods = useForm<AuthFormParams>();
+  const methods = useForm<AuthFormParams>({
+    resolver: zodResolver(authFormSchema),
+  });
   const { handleSubmit, setError } = methods;
 
   const createAccount = useMutation<
@@ -89,7 +88,13 @@ export const AuthButton = () => {
             </Text>
           </Modal.Header>
 
-          <Modal.Body>
+          <Modal.Body
+            css={{
+              display: "grid",
+              gap: 16,
+              paddingBottom: 24,
+            }}
+          >
             <FormInput placeholder="Email" name="email" required />
             <FormInput placeholder="Name" name="name" required />
           </Modal.Body>
