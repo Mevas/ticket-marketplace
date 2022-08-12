@@ -31,6 +31,7 @@ export const FormInput = ({ name, required, ...props }: FormInputProps) => {
           // getValues is needed as a hack to circumvent the controller not updating correctly for some reason
           value={controllerProps.field.value ?? getValues(name)}
           helperText={formState.errors[name]?.message as unknown as string}
+          helperColor={isErrored ? "error" : undefined}
         />
       )}
     />
