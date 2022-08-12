@@ -1,6 +1,6 @@
 import { atom } from "recoil";
 
-export const balanceState = atom<Record<number, number>>({
+export const balanceState = atom<number>({
   key: "balanceState",
-  default: {},
+  default: 0,
 });

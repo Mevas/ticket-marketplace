@@ -15,13 +15,14 @@ export const Event = () => {
   const event = useEvent(+(id ?? -1));
   const isMounted = useIsMounted();
 
-  if (!event && isMounted) {
-    router.replace("/");
-  }
-
   const methods = useForm({
     defaultValues: event,
   });
+
+  if (!event && isMounted) {
+    // router.replace("/");
+    return null;
+  }
 
   return (
     <Box>

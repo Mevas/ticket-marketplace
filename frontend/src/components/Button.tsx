@@ -9,9 +9,14 @@ export type ButtonProps = NextButtonProps & {
   loading?: boolean | string;
 };
 
-export const Button = ({ loading, children, ...props }: ButtonProps) => {
+export const Button = ({
+  loading,
+  children,
+  disabled,
+  ...props
+}: ButtonProps) => {
   return (
-    <NextButton disabled={!!loading} {...props}>
+    <NextButton {...props} disabled={disabled || !!loading}>
       {loading ? (
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <Loading type="spinner" color="currentColor" />

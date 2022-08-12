@@ -1,4 +1,3 @@
-import { BigNumberish } from "ethers";
 import { useRecoilState } from "recoil";
 import { useTicketContract } from "./use-ticket-contract";
 import { balanceState } from "../recoil/atoms/balance";
@@ -11,38 +10,29 @@ export const useBalance = () => {
   const account = useAccount();
   const { data: signer } = useSigner();
 
-  const getBalance = useCallback(
-    async (id: BigNumberish) => {
-      if (!account?.address) {
-        console.error("No account address!");
-        return;
-      }
+  const getBalance = useCallback(async () => {
+    if (!account?.address) {
+      console.error("No account address!");
+      return;
+    }
 
-      if (!signer) {
-        console.error("No signer!");
-        return;
-      }
+    if (!signer) {
+      console.error("No signer!");
+      return;
+    }
 
-      const connection = await contract.connect(account.address);
-      const balance = (
-        await connection.balanceOf(account.address, id)
-      ).toNumber();
+    const connection = await contract.connect(account.address);
+    const balance = (await connection.balanceOf(account.address)).toNumber();
 
-      setBalance((balances) => ({
-        ...balances,
-        [id.toString()]: balance,
-      }));
-    },
-    [account?.address, contract, setBalance, signer]
-  );
+    setBalance(balance);
+  }, [account?.address, contract, setBalance, signer]);
 
   useEffect(() => {
     if (!signer) {
       return;
     }
 
-    (async () =>
-      await Promise.all([1, 2].map(async (id) => await getBalance(id))))();
+    getBalance();
   }, [signer]);
 
   return useMemo(() => ({ balance, getBalance }), [balance, getBalance]);

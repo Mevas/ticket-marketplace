@@ -6,13 +6,20 @@ import { RecoilRoot } from "recoil";
 
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { Layout } from "../components/Layout";
-import { publicProvider } from "wagmi/providers/public";
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { Hydrate, QueryClient, QueryClientProvider } from "react-query";
 import { useState } from "react";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 
 const { provider, webSocketProvider } = configureChains(
-  [chain.mainnet, chain.polygon],
-  [publicProvider()]
+  [chain.hardhat /*, chain.mainnet, chain.polygon*/],
+  [
+    jsonRpcProvider({
+      rpc: () => ({
+        http: `http://127.0.0.1:8545/`,
+      }),
+    }),
+  ]
 );
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
@@ -39,6 +46,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
       provider,
       webSocketProvider,
       queryClient,
+      connectors: [new MetaMaskConnector({ chains: [chain.hardhat] })],
     })
   );
 

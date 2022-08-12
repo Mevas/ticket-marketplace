@@ -5,7 +5,7 @@ import path from "path";
 import { artifacts, ethers, network } from "hardhat";
 import { Contract } from "ethers";
 
-const tokenName = "Ticket";
+const tokenName = "CryptoTicket";
 
 const main = async () => {
   // This is just a convenience check

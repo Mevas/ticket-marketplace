@@ -1,4 +1,4 @@
-import { BigNumberish, utils } from "ethers";
+import { BigNumberish } from "ethers";
 import { useQuery } from "react-query";
 import { useTicketContract } from "./use-ticket-contract";
 import { useSigner } from "wagmi";
@@ -11,16 +11,7 @@ export const useTicket = (id: BigNumberish) => {
   return useQuery(
     ["ticket"],
     async () => {
-      return (
-        await axiosInstance.get(
-          (
-            await contract.uri(id)
-          ).replace(
-            "{id}",
-            utils.hexZeroPad(utils.hexlify(314592), 32).slice(2)
-          )
-        )
-      ).data;
+      return (await axiosInstance.get(await contract.tokenURI(id))).data;
     },
     {
       enabled: !!signer,
