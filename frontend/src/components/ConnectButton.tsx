@@ -20,6 +20,10 @@ import { Button } from "./Button";
 import { AuthButton } from "./AuthButton";
 import { AuthFormParams, authFormSchema } from "../utils/forms/authForm";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "react-query";
+import { PrismaError, User } from "../types";
+import { AxiosError } from "axios";
+import { axiosInstance } from "../utils/auth";
 
 export const ConnectButton = () => {
   const account = useAccount();
@@ -31,6 +35,8 @@ export const ConnectButton = () => {
   });
   const { disconnect } = useDisconnect();
   const user = useUser();
+  const [editing, setEditing] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleConnect = () => {
     connect({ connector: connectors[0] });
@@ -41,14 +47,49 @@ export const ConnectButton = () => {
     shouldUnregister: true,
     resolver: zodResolver(authFormSchema),
   });
-  const { reset, handleSubmit } = methods;
+  const { reset, handleSubmit, setError } = methods;
+
+  const updateUser = useMutation<
+    User,
+    AxiosError<PrismaError<keyof AuthFormParams>>,
+    AuthFormParams
+  >(
+    async (data) => {
+      return (await axiosInstance.patch("users", data)).data;
+    },
+    {
+      onSuccess: (newUser) => {
+        queryClient.setQueryData<User>(["me"], (): User | undefined => {
+          return newUser;
+        });
+
+        setEditing(false);
+      },
+      onError: (error) => {
+        const e = error.response?.data;
+
+        switch (e?.code) {
+          // Duplicate field
+          case "P2002": {
+            e.meta.target.forEach((field) => {
+              setError(field, {
+                message: `${field} already exists`,
+              });
+            });
+            break;
+          }
+          default: {
+            console.warn(`Error ${e?.code} not handled`, e);
+          }
+        }
+      },
+    }
+  );
 
   useEffect(() => {
     reset(user);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
-
-  const [editing, setEditing] = useState(false);
 
   return (
     <>
@@ -186,8 +227,7 @@ export const ConnectButton = () => {
                 <Form
                   methods={methods}
                   onSubmit={handleSubmit((data) => {
-                    console.log(data);
-                    setEditing(false);
+                    updateUser.mutate(data);
                   })}
                 >
                   <Card.Header>
@@ -200,6 +240,7 @@ export const ConnectButton = () => {
                             bordered
                             type="submit"
                             key="save"
+                            loading={updateUser.isLoading}
                           >
                             Save
                           </Button>
@@ -225,6 +266,7 @@ export const ConnectButton = () => {
                               setEditing(false);
                               reset(user);
                             }}
+                            disabled={updateUser.isLoading}
                           >
                             Cancel
                           </Button>

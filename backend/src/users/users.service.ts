@@ -18,7 +18,7 @@ export class UsersService {
       });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        throw new BadRequestException({ ...e });
+        throw new BadRequestException(e);
       }
     }
   }
@@ -35,8 +35,19 @@ export class UsersService {
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    try {
+      return await this.prisma.user.update({
+        where: {
+          id,
+        },
+        data: updateUserDto,
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new BadRequestException(e);
+      }
+    }
   }
 
   remove(id: number) {
