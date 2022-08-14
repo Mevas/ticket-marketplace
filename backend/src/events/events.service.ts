@@ -13,8 +13,8 @@ export class EventsService {
     private cryptoTickets: CryptoTicketService,
   ) {}
 
-  create(createEventDto: CreateEventDto, walletAddress: string) {
-    return this.prisma.event.create({
+  async create(createEventDto: CreateEventDto, walletAddress: string) {
+    const event = await this.prisma.event.create({
       data: {
         ...createEventDto,
         organizer: {
@@ -24,6 +24,15 @@ export class EventsService {
         },
       },
     });
+
+    const transaction = await this.cryptoTickets.contract.setOrganizerOfEventId(
+      event.id,
+      walletAddress,
+    );
+
+    await transaction.wait();
+
+    return event;
   }
 
   // TODO: optimize

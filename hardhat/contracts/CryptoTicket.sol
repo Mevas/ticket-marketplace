@@ -14,6 +14,7 @@ contract CryptoTicket is
     AccessControl
 {
     mapping(uint256 => uint256) public tokenIdToPrice;
+    mapping(uint256 => address) public eventIdToAddress;
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
@@ -43,12 +44,27 @@ contract CryptoTicket is
         tokenIdToPrice[ticketId] = newPrice;
     }
 
+    function setOrganizerOfEventId(uint256 eventId, address organizer)
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        eventIdToAddress[eventId] = organizer;
+    }
+
+    modifier onlyOrganizer(uint256 eventId) {
+        require(
+            eventIdToAddress[eventId] == msg.sender,
+            "Only the organizer is allowed to do this operation"
+        );
+        _;
+    }
+
     function safeMintForEvent(
         address to,
         uint256 quantity,
         uint256 eventId,
         uint256 price
-    ) public onlyRole(MINTER_ROLE) {
+    ) public onlyOrganizer(eventId) {
         // Emit minting event to let the backend know what event these tickets belong to
         emit MintingForEvent(eventId);
 
