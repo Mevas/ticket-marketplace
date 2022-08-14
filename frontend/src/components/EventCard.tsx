@@ -38,14 +38,20 @@ export const EventCard = ({ event }: EventCardProps) => {
       </Card.Body>
 
       <Card.Footer
-        isBlurred
-        css={{
-          position: "absolute",
-          bgBlur: "#ffffff66",
-          borderTop: "$borderWeights$light solid rgba(255, 255, 255, 0.2)",
-          bottom: 0,
-          zIndex: 1,
-        }}
+        isBlurred={!isFirefox}
+        css={
+          !isFirefox
+            ? {
+                position: "absolute",
+                bgBlur: "#ffffff66",
+                bgColor: isDark ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.5)",
+                borderTop:
+                  "$borderWeights$light solid rgba(255, 255, 255, 0.2)",
+                bottom: 0,
+                zIndex: 1,
+              }
+            : undefined
+        }
       >
         <Col>
           <Row justify="flex-end">
