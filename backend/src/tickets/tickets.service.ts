@@ -2,44 +2,27 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  BaseProvider,
-  EthersContract,
-  InjectContractProvider,
-  InjectEthersProvider,
-} from 'nestjs-ethers';
-import { contractAddresses, CryptoTicketABI } from '../utils/hardhat';
-import { CryptoTicket } from '../hardhat/typechain-types';
 import { BigNumber, Event } from 'ethers';
 import { EventsService } from '../events/events.service';
 import { Prisma } from '@prisma/client';
+import { CryptoTicketService } from '../crypto-ticket/crypto-ticket.service';
 
 @Injectable()
 export class TicketsService implements OnModuleInit {
-  contract: CryptoTicket;
-
   constructor(
     private prisma: PrismaService,
     private eventsService: EventsService,
-    @InjectEthersProvider()
-    private readonly ethersProvider: BaseProvider,
-    @InjectContractProvider()
-    private readonly ethersContract: EthersContract,
-  ) {
-    this.contract = this.ethersContract.create(
-      contractAddresses.CryptoTicket,
-      CryptoTicketABI.abi,
-    ) as CryptoTicket;
-  }
+    private cryptoTickets: CryptoTicketService,
+  ) {}
 
   async onModuleInit() {
     let mintingForEvent = -1;
 
-    this.contract.on('MintingForEvent', (async (eventId, event) => {
+    this.cryptoTickets.contract.on('MintingForEvent', (async (eventId) => {
       mintingForEvent = eventId.toNumber();
     }) as (eventId: BigNumber, event: Event) => void);
 
-    this.contract.on('Transfer', (async (from, to, id) => {
+    this.cryptoTickets.contract.on('Transfer', (async (from, to, id) => {
       const event = await this.eventsService.getEventOwnedByAddress(
         mintingForEvent,
         to,
@@ -84,11 +67,7 @@ export class TicketsService implements OnModuleInit {
   }
 
   async getTickets(address: string) {
-    const ticketIds = (await this.contract.tokensOfOwner(address)).map((id) =>
-      id.toNumber(),
-    );
-
-    console.log(ticketIds);
+    const ticketIds = await this.cryptoTickets.getTicketIdsOfAddress(address);
 
     return await this.prisma.ticket.findMany({
       where: {

@@ -1,8 +1,14 @@
 export type Event = {
   id: number;
+  organizerId: number;
   title: string;
   description?: string;
-  organizerId: number;
+  organizer: User;
+};
+
+export type AdminEvent = Event & {
+  ticketCount: number;
+  ticketSold: number;
 };
 
 export type User = {

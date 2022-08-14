@@ -34,7 +34,7 @@ export class EventsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(+id);
+    return this.eventsService.getEventAsAdmin(+id);
   }
 
   @Patch(':id')

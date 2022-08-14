@@ -12,7 +12,7 @@ import { Account } from "../../components/Account";
 export const Event = () => {
   const router = useRouter();
   const { id } = router.query;
-  const event = useEvent(+(id ?? -1));
+  const { event } = useEvent(id ? +id : undefined);
   const isMounted = useIsMounted();
 
   const methods = useForm({
@@ -27,12 +27,13 @@ export const Event = () => {
   return (
     <Box>
       <Text h1>{event?.title}</Text>
-
       <Box>{isMounted && <Account />}</Box>
-
       <Form methods={methods}>
         <FormInput name="title" />
       </Form>
+
+      <div>Total tickets: {event?.ticketCount}</div>
+      <div>Tickets sold: {event?.ticketSold}</div>
     </Box>
   );
 };

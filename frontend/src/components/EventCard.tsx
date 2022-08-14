@@ -1,17 +1,24 @@
 import React from "react";
-import { Button, Card, Col, Row, Text } from "@nextui-org/react";
+import { Button, Card, Col, Row, Text, useTheme } from "@nextui-org/react";
 import { Event } from "../types";
 import { useUser } from "../hooks/useUser";
 import Link from "next/link";
+import { useEvent } from "../hooks/use-event";
+import { isFirefox } from "react-device-detect";
 
 export type EventCardProps = {
   event: Event;
 };
 
-export const EventCard = ({ event }: EventCardProps) => {
+export const EventCard = ({ event: _event }: EventCardProps) => {
   const user = useUser();
+  const isOrganizer = user.id === _event.organizerId;
+  const { event: adminEvent } = useEvent(_event.id, {
+    enabled: isOrganizer,
+  });
+  const { isDark } = useTheme();
 
-  const isOrganizer = user.id === event.organizerId;
+  const event = { ..._event, ...adminEvent };
 
   return (
     <Card isHoverable isPressable>
@@ -54,7 +61,15 @@ export const EventCard = ({ event }: EventCardProps) => {
         }
       >
         <Col>
-          <Row justify="flex-end">
+          <Row justify="space-between" align="center">
+            <Col>
+              {isOrganizer && event.ticketSold !== undefined && (
+                <Text color="white" h6>
+                  {event.ticketSold} / {event.ticketCount} tickets sold
+                </Text>
+              )}
+            </Col>
+
             {isOrganizer ? (
               <Link href={`/events/${event.id}`}>
                 <Button flat auto rounded color="primary">
