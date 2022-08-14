@@ -39,8 +39,15 @@ contract CryptoTicket is
         return tokenIdToPrice[ticketId];
     }
 
+    modifier onlyOwnerOfTicket(uint256 ticketId) {
+        require(
+            msg.sender == ownerOf(ticketId),
+            "Only the owner of this ticket is allowed to do this operation"
+        );
+        _;
+    }
+
     function setTicketPrice(uint256 ticketId, uint256 newPrice) public {
-        require(msg.sender == ownerOf(ticketId), "Not the owner of this token");
         tokenIdToPrice[ticketId] = newPrice;
     }
 
