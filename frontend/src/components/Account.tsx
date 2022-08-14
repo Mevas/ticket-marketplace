@@ -10,11 +10,12 @@ import { useTicketContract } from "../hooks/use-ticket-contract";
 import { useBalance } from "../hooks/use-balance";
 import { CryptoTicketABI } from "../utils/hardhat";
 import { Button } from "./Button";
+import { useTickets } from "../hooks/use-tickets";
 
 export const Account = () => {
   const account = useAccount();
   const contract = useTicketContract();
-  const { balance, getBalance } = useBalance();
+  const { getBalance } = useBalance();
 
   const { config } = usePrepareContractWrite({
     addressOrName: contract.address,
@@ -31,6 +32,8 @@ export const Account = () => {
       await getBalance();
     },
   });
+
+  const tickets = useTickets();
 
   return (
     <Box>
@@ -53,7 +56,11 @@ export const Account = () => {
         Test view
       </Button>
 
-      {balance}
+      <div style={{ display: "flex", gap: 10 }}>
+        {tickets?.map((ticket, index) => (
+          <div key={index}>{ticket.number}</div>
+        ))}
+      </div>
     </Box>
   );
 };

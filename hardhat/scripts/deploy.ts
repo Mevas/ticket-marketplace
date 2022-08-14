@@ -34,11 +34,12 @@ const main = async () => {
 
   // We also save the contract's artifacts and address in the frontend directory
   saveFrontendFiles(token);
+  saveBackendFiles(token);
 };
 
-const saveFrontendFiles = (token: Contract) => {
+const saveFiles = (basePath: string) => (token: Contract) => {
   const fs = require("fs");
-  const contractsDir = path.join(__dirname, "../../frontend/src/contracts");
+  const contractsDir = path.join(__dirname, `${basePath}/src/contracts`);
 
   if (!fs.existsSync(contractsDir)) {
     fs.mkdirSync(contractsDir, { recursive: true });
@@ -56,6 +57,10 @@ const saveFrontendFiles = (token: Contract) => {
     JSON.stringify(TokenArtifact, null, 2)
   );
 };
+
+const saveFrontendFiles = saveFiles("../../frontend");
+
+const saveBackendFiles = saveFiles("../../backend");
 
 main()
   .then(() => process.exit(0))

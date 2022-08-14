@@ -51,4 +51,21 @@ contract CryptoTicket is
     {
         return super.supportsInterface(interfaceId);
     }
+
+    function tokensOfOwner(address owner)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        uint256 balance = super.balanceOf(owner);
+        uint256[] memory tokens = new uint256[](balance);
+
+        for (uint256 i = 0; i < balance; i++) {
+            tokens[i] = (
+                super.tokenOfOwnerByIndex(owner, i)
+            );
+        }
+
+        return tokens;
+    }
 }
