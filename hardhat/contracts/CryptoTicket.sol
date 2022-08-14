@@ -1,25 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "erc721a/contracts/ERC721A.sol";
+import "erc721a/contracts/extensions/ERC721ABurnable.sol";
+import "erc721a/contracts/extensions/ERC721AQueryable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 /// @custom:security-contact alexandru.vasilescu01@gmail.com
 contract CryptoTicket is
-    ERC721,
-    ERC721Enumerable,
-    ERC721Burnable,
+    ERC721A,
+    ERC721AQueryable,
+    ERC721ABurnable,
     AccessControl
 {
-    using Counters for Counters.Counter;
-
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    Counters.Counter private _tokenIdCounter;
 
-    constructor() ERC721("CryptoTicket", "TKT") {
+    constructor() ERC721A("CryptoTicket", "TKT") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
     }
@@ -28,44 +24,21 @@ contract CryptoTicket is
         return "http://localhost:9000/tickets/";
     }
 
-    function safeMint(address to) public onlyRole(MINTER_ROLE) {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
-    }
-
-    // The following functions are overrides required by Solidity.
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override(ERC721, ERC721Enumerable) {
-        super._beforeTokenTransfer(from, to, tokenId);
+    function safeMint(address to, uint256 quantity)
+        public
+        onlyRole(MINTER_ROLE)
+    {
+        require(quantity <= 1000, 'Please mint less than 1000 tokens at a time');
+        _safeMint(to, quantity);
     }
 
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, ERC721Enumerable, AccessControl)
+        virtual
+        override(ERC721A, AccessControl)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
-    }
-
-    function tokensOfOwner(address owner)
-        external
-        view
-        returns (uint256[] memory)
-    {
-        uint256 balance = super.balanceOf(owner);
-        uint256[] memory tokens = new uint256[](balance);
-
-        for (uint256 i = 0; i < balance; i++) {
-            tokens[i] = (
-                super.tokenOfOwnerByIndex(owner, i)
-            );
-        }
-
-        return tokens;
     }
 }

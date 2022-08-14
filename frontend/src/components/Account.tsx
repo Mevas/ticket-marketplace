@@ -21,7 +21,7 @@ export const Account = () => {
     addressOrName: contract.address,
     contractInterface: CryptoTicketABI.abi,
     functionName: "safeMint",
-    args: [account.address],
+    args: [account.address, 5],
   });
   const { write, data, isLoading: isTransacting } = useContractWrite(config);
   const { isLoading } = useWaitForTransaction({
