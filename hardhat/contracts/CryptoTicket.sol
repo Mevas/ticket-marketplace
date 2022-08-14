@@ -24,12 +24,21 @@ contract CryptoTicket is
         return "http://localhost:9000/tickets/";
     }
 
-    function safeMint(address to, uint256 quantity)
-        public
-        onlyRole(MINTER_ROLE)
-    {
-        require(quantity <= 1000, 'Please mint less than 1000 tokens at a time');
+    function safeMint(address to, uint256 quantity) private {
+        require(
+            quantity <= 1000,
+            "Please mint less than 1000 tokens at a time"
+        );
         _safeMint(to, quantity);
+    }
+
+    function safeMintForEvent(
+        address to,
+        uint256 quantity,
+        uint256 eventId
+    ) public onlyRole(MINTER_ROLE) {
+        emit MintingForEvent(eventId);
+        safeMint(to, quantity);
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -41,4 +50,6 @@ contract CryptoTicket is
     {
         return super.supportsInterface(interfaceId);
     }
+
+    event MintingForEvent(uint256 eventId);
 }

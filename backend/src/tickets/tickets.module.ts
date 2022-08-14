@@ -3,12 +3,14 @@ import { TicketsService } from './tickets.service';
 import { TicketsController } from './tickets.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { EthersModule } from 'nestjs-ethers';
+import { EventsModule } from '../events/events.module';
 
 @Module({
   controllers: [TicketsController],
   providers: [TicketsService],
   imports: [
     PrismaModule,
+    EventsModule,
     EthersModule.forRoot({
       network: {
         name: 'hardhat',

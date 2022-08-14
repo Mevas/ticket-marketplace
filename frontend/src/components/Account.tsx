@@ -11,17 +11,21 @@ import { useBalance } from "../hooks/use-balance";
 import { CryptoTicketABI } from "../utils/hardhat";
 import { Button } from "./Button";
 import { useTickets } from "../hooks/use-tickets";
+import { useRouter } from "next/router";
 
 export const Account = () => {
   const account = useAccount();
   const contract = useTicketContract();
   const { getBalance } = useBalance();
+  const router = useRouter();
+  const { id } = router.query;
 
   const { config } = usePrepareContractWrite({
     addressOrName: contract.address,
     contractInterface: CryptoTicketABI.abi,
-    functionName: "safeMint",
-    args: [account.address, 5],
+    functionName: "safeMintForEvent",
+    args: [account.address, 5, +id!],
+    enabled: typeof id !== "undefined",
   });
   const { write, data, isLoading: isTransacting } = useContractWrite(config);
   const { isLoading } = useWaitForTransaction({
@@ -58,7 +62,7 @@ export const Account = () => {
 
       <div style={{ display: "flex", gap: 10 }}>
         {tickets?.map((ticket, index) => (
-          <div key={index}>{ticket.number}</div>
+          <div key={index}>{ticket.id}</div>
         ))}
       </div>
     </Box>

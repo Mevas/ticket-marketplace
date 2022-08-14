@@ -35,4 +35,18 @@ export class EventsService {
   remove(id: number) {
     return `This action removes a #${id} event`;
   }
+
+  async getEventOwnedByAddress(id: number, address: string) {
+    return await this.prisma.event.findFirst({
+      where: {
+        id,
+        organizer: {
+          walletAddress: {
+            equals: address.toLowerCase(),
+          },
+        },
+      },
+      include: { organizer: true },
+    });
+  }
 }
