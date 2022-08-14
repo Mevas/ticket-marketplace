@@ -22,6 +22,14 @@ export type User = {
   walletAddress: string;
 };
 
+export type Ticket = {
+  id: number;
+  art?: string;
+  number: number;
+  tier: string;
+  eventId: number;
+};
+
 export type PrismaError<T extends string = string> = {
   code: string;
   clientVersion: string;

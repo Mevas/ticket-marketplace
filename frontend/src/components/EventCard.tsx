@@ -5,6 +5,9 @@ import { useUser } from "../hooks/useUser";
 import Link from "next/link";
 import { useEvent } from "../hooks/use-event";
 import { isFirefox } from "react-device-detect";
+import { useTicketContract } from "../hooks/use-ticket-contract";
+import { ethers } from "ethers";
+import { useTickets } from "../hooks/use-tickets";
 
 export type EventCardProps = {
   event: Event;
@@ -16,9 +19,15 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
   const { event: adminEvent } = useEvent(_event.id, {
     enabled: isOrganizer,
   });
+  const contract = useTicketContract();
   const { isDark } = useTheme();
 
   const event = { ..._event, ...adminEvent };
+
+  const tickets = useTickets();
+  const hasTicketsForEvent = tickets?.find(
+    (ticket) => ticket.eventId === event.id
+  );
 
   return (
     <Card isHoverable isPressable>
@@ -83,13 +92,19 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
                   </Text>
                 </Button>
               </Link>
-            ) : (
+            ) : !hasTicketsForEvent ? (
               <Button
                 flat
                 auto
                 rounded
                 color="secondary"
                 disabled={event.soldOut}
+                onPress={async () => {
+                  console.log("buy");
+                  await contract.buyTicket(0, {
+                    value: ethers.utils.parseEther("0.5"),
+                  });
+                }}
               >
                 <Text
                   css={{ color: "inherit" }}
@@ -100,6 +115,19 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
                   {event.soldOut ? "Sold out" : "Buy tickets"}
                 </Text>
               </Button>
+            ) : (
+              hasTicketsForEvent && (
+                <Button flat auto rounded color="gradient">
+                  <Text
+                    css={{ color: "inherit" }}
+                    size={12}
+                    weight="bold"
+                    transform="uppercase"
+                  >
+                    View Tickets
+                  </Text>
+                </Button>
+              )
             )}
           </Row>
         </Col>

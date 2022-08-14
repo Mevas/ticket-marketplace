@@ -15,6 +15,7 @@ import { AdminEvent } from "../types";
 import { useForm } from "react-hook-form";
 import { Form } from "./forms/Form";
 import { FormInput } from "./forms/FormInput";
+import { ethers, utils } from "ethers";
 
 export const Account = () => {
   const account = useAccount();
@@ -35,7 +36,7 @@ export const Account = () => {
     addressOrName: contract.address,
     contractInterface: CryptoTicketABI.abi,
     functionName: "safeMintForEvent",
-    args: [account.address, quantity, +id!],
+    args: [account.address, quantity, +id!, utils.parseEther("0.5")],
     enabled: typeof id !== "undefined",
   });
   const { write, data, isLoading: isTransacting } = useContractWrite(config);
@@ -75,11 +76,19 @@ export const Account = () => {
 
       <Button
         onClick={async () => {
-          // const test = await contract.testView();
-          // console.log(test);
+          const test = await contract.getTicketPrice(0);
+          console.log(ethers.utils.formatEther(test));
         }}
       >
         Test view
+      </Button>
+
+      <Button
+        onClick={async () => {
+          console.log(await contract.ownerOf(0));
+        }}
+      >
+        View owner
       </Button>
 
       <div style={{ display: "flex", gap: 10 }}>
