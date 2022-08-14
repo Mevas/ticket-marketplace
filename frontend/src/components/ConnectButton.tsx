@@ -141,8 +141,9 @@ export const ConnectButton = () => {
               <Modal.Body>
                 <Row justify="center">
                   <Text css={{ textAlign: "center" }}>
-                    The connection attempt failed. Please click try again and
-                    follow the steps to connect in your wallet.
+                    {connection.error?.message === "Connector not found"
+                      ? "Please install a wallet, such as MetaMask."
+                      : "The connection attempt failed. Please click try again and follow the steps to connect in your wallet."}
                   </Text>
                 </Row>
               </Modal.Body>
