@@ -84,14 +84,20 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
                 </Button>
               </Link>
             ) : (
-              <Button flat auto rounded color="secondary">
+              <Button
+                flat
+                auto
+                rounded
+                color="secondary"
+                disabled={event.soldOut}
+              >
                 <Text
                   css={{ color: "inherit" }}
                   size={12}
                   weight="bold"
                   transform="uppercase"
                 >
-                  Buy tickets
+                  {event.soldOut ? "Sold out" : "Buy tickets"}
                 </Text>
               </Button>
             )}

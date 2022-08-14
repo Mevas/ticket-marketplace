@@ -3,6 +3,8 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { CryptoTicketService } from '../crypto-ticket/crypto-ticket.service';
+import { Event, User } from '@prisma/client';
+import _ from 'lodash';
 
 @Injectable()
 export class EventsService {
@@ -24,18 +26,72 @@ export class EventsService {
     });
   }
 
-  findAll() {
-    return this.prisma.event.findMany();
-  }
+  // TODO: optimize
+  async getSoldTickets(
+    event: Event & { organizer: User; _count: { tickets: number } },
+  ) {
+    const ticketIds = await this.cryptoTickets.getTicketIdsOfAddress(
+      event.organizer.walletAddress,
+    );
 
-  async getEvent(id: number) {
-    const event = await this.prisma.event.findUnique({
+    const organizerTicketsInEvent = await this.prisma.ticket.count({
       where: {
-        id,
+        id: {
+          in: ticketIds,
+        },
+        eventId: event.id,
       },
     });
 
-    return event;
+    return event._count.tickets - organizerTicketsInEvent;
+  }
+
+  async findAll() {
+    let events = await this.prisma.event.findMany({
+      include: {
+        _count: {
+          select: {
+            tickets: true,
+          },
+        },
+        organizer: true,
+      },
+    });
+
+    events = await Promise.all(
+      events.map(async (event) => ({
+        ...event,
+        soldOut: (await this.getSoldTickets(event)) === event._count.tickets,
+      })),
+    );
+
+    return events.map((event) => _.omit(event, ['_count']));
+  }
+
+  async getEvent(id: number) {
+    const foundEvent = await this.prisma.event.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        _count: {
+          select: {
+            tickets: true,
+          },
+        },
+        organizer: true,
+      },
+    });
+
+    if (!foundEvent) {
+      throw new BadRequestException('No event with the given id');
+    }
+
+    return {
+      ...foundEvent,
+      soldOut:
+        (await this.getSoldTickets(foundEvent)) === foundEvent._count.tickets,
+    };
   }
 
   async getEventAsAdmin(id: number) {
@@ -57,14 +113,10 @@ export class EventsService {
       throw new BadRequestException('No event with the given id');
     }
 
-    const ticketIds = await this.cryptoTickets.getTicketIdsOfAddress(
-      event.organizer.walletAddress,
-    );
-
     return {
       ...event,
       ticketCount: event._count.tickets,
-      ticketSold: event._count.tickets - ticketIds.length,
+      ticketSold: await this.getSoldTickets(event),
     };
   }
 
@@ -86,7 +138,14 @@ export class EventsService {
           },
         },
       },
-      include: { organizer: true },
+      include: {
+        _count: {
+          select: {
+            tickets: true,
+          },
+        },
+        organizer: true,
+      },
     });
   }
 }

@@ -1,4 +1,4 @@
-export type Event = {
+export type BaseEvent = {
   id: number;
   organizerId: number;
   title: string;
@@ -6,7 +6,11 @@ export type Event = {
   organizer: User;
 };
 
-export type AdminEvent = Event & {
+export type Event = BaseEvent & {
+  soldOut: boolean;
+};
+
+export type AdminEvent = BaseEvent & {
   ticketCount: number;
   ticketSold: number;
 };
