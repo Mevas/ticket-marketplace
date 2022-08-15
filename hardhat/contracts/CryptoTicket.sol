@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity 0.8.4;
 
 import "erc721a/contracts/ERC721A.sol";
 import "erc721a/contracts/extensions/ERC721ABurnable.sol";
 import "erc721a/contracts/extensions/ERC721AQueryable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "hardhat/console.sol";
 
 /// @custom:security-contact alexandru.vasilescu01@gmail.com
 contract CryptoTicket is ERC721A, ERC721AQueryable, ERC721ABurnable, AccessControl {
@@ -38,7 +37,7 @@ contract CryptoTicket is ERC721A, ERC721AQueryable, ERC721ABurnable, AccessContr
         return ticketIdToPrice[ticketId];
     }
 
-    function setTicketPrice(uint256 ticketId, uint256 newPrice) public onlyOwnerOfTicket(ticketId) {
+    function setTicketPrice(uint256 ticketId, uint256 newPrice) external onlyOwnerOfTicket(ticketId) {
         ticketIdToPrice[ticketId] = newPrice;
     }
 
@@ -56,7 +55,7 @@ contract CryptoTicket is ERC721A, ERC721AQueryable, ERC721ABurnable, AccessContr
         uint256 quantity,
         uint256 eventId,
         uint256 price
-    ) public onlyOrganizer(eventId) {
+    ) external onlyOrganizer(eventId) {
         require(quantity <= 1000, "Please mint less than 1000 tickets at a time");
 
         // Emit minting event to let the backend know what event these tickets belong to
@@ -117,7 +116,7 @@ contract CryptoTicket is ERC721A, ERC721AQueryable, ERC721ABurnable, AccessContr
         return getTicketPrice(ticketIdToCheck);
     }
 
-    function buyTicket(uint256 eventId) public payable {
+    function buyTicket(uint256 eventId) external payable {
         require(msg.sender != eventIdToOrganizer[eventId], "Organizer can't buy their own tickets");
         uint256 ticketIdToBuy = getFirstAvailableTicketForEvent(eventId);
         require(msg.value >= ticketIdToPrice[ticketIdToBuy], "ETH amount too low");
