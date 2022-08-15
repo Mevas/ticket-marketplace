@@ -145,16 +145,18 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
               </Button>
             ) : (
               hasTicketsForEvent && (
-                <Button flat auto rounded color="gradient">
-                  <Text
-                    css={{ color: "inherit" }}
-                    size={12}
-                    weight="bold"
-                    transform="uppercase"
-                  >
-                    View Tickets
-                  </Text>
-                </Button>
+                <Link href="/tickets">
+                  <Button flat auto rounded color="gradient">
+                    <Text
+                      css={{ color: "inherit" }}
+                      size={12}
+                      weight="bold"
+                      transform="uppercase"
+                    >
+                      View Tickets
+                    </Text>
+                  </Button>
+                </Link>
               )
             )}
           </Row>

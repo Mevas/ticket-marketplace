@@ -28,6 +28,7 @@ export type Ticket = {
   number: number;
   tier: string;
   eventId: number;
+  event: BaseEvent;
 };
 
 export type PrismaError<T extends string = string> = {

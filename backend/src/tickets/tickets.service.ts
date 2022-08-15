@@ -1,6 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { BigNumber, ethers, Event } from 'ethers';
 import { EventsService } from '../events/events.service';
@@ -80,17 +79,25 @@ export class TicketsService implements OnModuleInit {
           in: ticketIds,
         },
       },
+      include: {
+        event: true,
+      },
       orderBy: {
         id: 'asc',
       },
     });
   }
 
-  update(id: number, updateTicketDto: UpdateTicketDto) {
-    return `This action updates a #${id} ticket`;
-  }
+  async verifyTicket(signedTicket: { message: string; signedMessage: string }) {
+    const messageAddress = ethers.utils.verifyMessage(
+      signedTicket.message,
+      signedTicket.signedMessage,
+    );
 
-  remove(id: number) {
-    return `This action removes a #${id} ticket`;
+    const ownerOfTicket = await this.cryptoTickets.contract.ownerOf(
+      +signedTicket.message,
+    );
+
+    return ownerOfTicket === messageAddress;
   }
 }

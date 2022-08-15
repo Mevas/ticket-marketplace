@@ -21,9 +21,17 @@ export const Navbar = () => {
 
         <div style={{ display: "flex", gap: "32px" }}>
           {user.isLoggedIn && (
-            <Link href="/events/new">
-              <Button rounded>Create event</Button>
-            </Link>
+            <>
+              <Link href="/tickets">
+                <Button rounded color="gradient">
+                  My tickets
+                </Button>
+              </Link>
+
+              <Link href="/events/new">
+                <Button rounded>Create event</Button>
+              </Link>
+            </>
           )}
 
           {isMounted && <ConnectButton />}
