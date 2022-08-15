@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { BigNumber, Event } from 'ethers';
+import { BigNumber, ethers, Event } from 'ethers';
 import { EventsService } from '../events/events.service';
 import { Prisma } from '@prisma/client';
 import { CryptoTicketService } from '../crypto-ticket/crypto-ticket.service';
@@ -23,32 +23,37 @@ export class TicketsService implements OnModuleInit {
     }) as (eventId: BigNumber, event: Event) => void);
 
     this.cryptoTickets.contract.on('Transfer', (async (from, to, id) => {
-      const event = await this.eventsService.getEventOwnedByAddress(
-        mintingForEvent,
-        to,
-      );
-      if (!event) {
-        console.warn('User is not owner of project');
-        return;
-      }
+      if (from !== ethers.constants.AddressZero) {
+        console.log('normal transfer', from, to, id);
+      } else {
+        const event = await this.eventsService.getEventOwnedByAddress(
+          mintingForEvent,
+          to,
+        );
 
-      try {
-        await this.prisma.ticket.create({
-          data: {
-            event: {
-              connect: {
-                id: mintingForEvent,
+        if (!event) {
+          console.warn(`User ${to} is not owner of project ${mintingForEvent}`);
+          return;
+        }
+
+        try {
+          await this.prisma.ticket.create({
+            data: {
+              event: {
+                connect: {
+                  id: mintingForEvent,
+                },
               },
+              art: null,
+              tier: 'GA',
+              id: id.toNumber(),
+              number: -1,
             },
-            art: null,
-            tier: 'GA',
-            id: id.toNumber(),
-            number: -1,
-          },
-        });
-      } catch (e) {
-        if (e instanceof Prisma.PrismaClientKnownRequestError) {
-          console.log('Tried recreating a ticket');
+          });
+        } catch (e) {
+          if (e instanceof Prisma.PrismaClientKnownRequestError) {
+            console.log('Tried recreating a ticket');
+          }
         }
       }
     }) as (from: string, to: string, id: BigNumber, event: Event) => void);
