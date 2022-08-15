@@ -8,6 +8,7 @@ import { isFirefox } from "react-device-detect";
 import { useTicketContract } from "../hooks/use-ticket-contract";
 import { ethers } from "ethers";
 import { useTickets } from "../hooks/use-tickets";
+import { Price } from "./Price";
 
 export type EventCardProps = {
   event: Event;
@@ -41,7 +42,7 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [event.id]);
+  }, [contract, event.id]);
 
   return (
     <Card isHoverable isPressable>
@@ -85,16 +86,27 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
       >
         <Col>
           <Row justify="space-between" align="center">
-            <Col>
-              <>
-                {isOrganizer && event.ticketSold !== undefined && (
-                  <Text color="white" h6>
-                    {event.ticketSold} / {event.ticketCount} tickets sold
-                  </Text>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div>
+                {isOrganizer ? (
+                  <>
+                    {event.ticketSold !== undefined && (
+                      <Text color={!isFirefox ? "white" : undefined} h6>
+                        {event.ticketSold} / {event.ticketCount} tickets sold
+                      </Text>
+                    )}
+                  </>
+                ) : (
+                  price && (
+                    <>
+                      <div>
+                        <Price price={price} currency="ETH" />
+                      </div>
+                    </>
+                  )
                 )}
-                {price}
-              </>
-            </Col>
+              </div>
+            </div>
 
             {isOrganizer ? (
               <Link href={`/events/${event.id}`}>

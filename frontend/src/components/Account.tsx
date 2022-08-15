@@ -15,7 +15,7 @@ import { AdminEvent } from "../types";
 import { useForm } from "react-hook-form";
 import { Form } from "./forms/Form";
 import { FormInput } from "./forms/FormInput";
-import { ethers, utils } from "ethers";
+import { utils } from "ethers";
 
 export const Account = () => {
   const account = useAccount();
@@ -73,21 +73,6 @@ export const Account = () => {
       <Form methods={methods}>
         <FormInput label="Quantity" name="quantity" type="number" />
       </Form>
-
-      <Button
-        onClick={async () => {
-          const test = await contract.getTicketPrice(0);
-          console.log(ethers.utils.formatEther(test));
-        }}
-      >
-        Test view
-      </Button>
-
-      <div style={{ display: "flex", gap: 10 }}>
-        {/*{tickets?.map((ticket, index) => (*/}
-        {/*  <div key={index}>{ticket.id}</div>*/}
-        {/*))}*/}
-      </div>
     </Box>
   );
 };
