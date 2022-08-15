@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Row, Text, useTheme } from "@nextui-org/react";
 import { Event } from "../types";
 import { useUser } from "../hooks/useUser";
@@ -28,6 +28,20 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
   const hasTicketsForEvent = tickets?.find(
     (ticket) => ticket.eventId === event.id
   );
+
+  const [price, setPrice] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const price = await contract.getEventPrice(event.id);
+        setPrice(ethers.utils.formatEther(price));
+      } catch (e) {
+        console.log(`Couldn't get price for event ${event.id}`);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event.id]);
 
   return (
     <Card isHoverable isPressable>
@@ -72,11 +86,14 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
         <Col>
           <Row justify="space-between" align="center">
             <Col>
-              {isOrganizer && event.ticketSold !== undefined && (
-                <Text color="white" h6>
-                  {event.ticketSold} / {event.ticketCount} tickets sold
-                </Text>
-              )}
+              <>
+                {isOrganizer && event.ticketSold !== undefined && (
+                  <Text color="white" h6>
+                    {event.ticketSold} / {event.ticketCount} tickets sold
+                  </Text>
+                )}
+                {price}
+              </>
             </Col>
 
             {isOrganizer ? (
@@ -100,9 +117,8 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
                 color="secondary"
                 disabled={event.soldOut}
                 onPress={async () => {
-                  console.log("buy");
-                  await contract.buyTicket(0, {
-                    value: ethers.utils.parseEther("0.5"),
+                  await contract.buyTicket(event.id, {
+                    value: await contract.getEventPrice(event.id),
                   });
                 }}
               >

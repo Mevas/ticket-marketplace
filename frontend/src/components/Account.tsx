@@ -83,14 +83,6 @@ export const Account = () => {
         Test view
       </Button>
 
-      <Button
-        onClick={async () => {
-          console.log(await contract.ownerOf(0));
-        }}
-      >
-        View owner
-      </Button>
-
       <div style={{ display: "flex", gap: 10 }}>
         {/*{tickets?.map((ticket, index) => (*/}
         {/*  <div key={index}>{ticket.id}</div>*/}
