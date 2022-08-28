@@ -90,9 +90,15 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
               <div>
                 {isOrganizer ? (
                   <>
-                    {event.ticketSold !== undefined && (
+                    {event.ticketCount !== undefined &&
+                    event.ticketCount > 0 &&
+                    event.ticketSold !== undefined ? (
                       <Text color={!isFirefox ? "white" : undefined} h6>
                         {event.ticketSold} / {event.ticketCount} tickets sold
+                      </Text>
+                    ) : (
+                      <Text color={!isFirefox ? "white" : undefined} h6>
+                        No tickets created
                       </Text>
                     )}
                   </>
