@@ -27,7 +27,7 @@ export const Account = () => {
   const methods = useForm<{ quantity: number; price: number }>({
     defaultValues: {
       quantity: 5,
-      price: 0.5,
+      price: 0.1,
     },
   });
   const { watch } = methods;
