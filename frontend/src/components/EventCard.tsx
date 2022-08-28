@@ -121,7 +121,7 @@ export const EventCard = ({ event: _event }: EventCardProps) => {
                   </Text>
                 </Button>
               </Link>
-            ) : !hasTicketsForEvent ? (
+            ) : !hasTicketsForEvent && user.isLoggedIn ? (
               <Button
                 flat
                 auto

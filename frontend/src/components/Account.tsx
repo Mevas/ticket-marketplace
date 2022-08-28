@@ -24,19 +24,21 @@ export const Account = () => {
   const { id } = router.query;
   const queryClient = useQueryClient();
 
-  const methods = useForm<{ quantity: number }>({
+  const methods = useForm<{ quantity: number; price: number }>({
     defaultValues: {
       quantity: 5,
+      price: 0.5,
     },
   });
   const { watch } = methods;
   const quantity = +watch("quantity");
+  const price = +watch("price");
 
   const { config } = usePrepareContractWrite({
     addressOrName: contract.address,
     contractInterface: CryptoTicketABI.abi,
     functionName: "safeMintForEvent",
-    args: [account.address, quantity, +id!, utils.parseEther("0.5")],
+    args: [account.address, quantity, +id!, utils.parseEther(price.toString())],
     enabled: typeof id !== "undefined",
   });
   const { write, data, isLoading: isTransacting } = useContractWrite(config);
@@ -72,6 +74,7 @@ export const Account = () => {
 
       <Form methods={methods}>
         <FormInput label="Quantity" name="quantity" type="number" />
+        <FormInput label="Price (ETH)" name="price" type="number" />
       </Form>
     </Box>
   );
