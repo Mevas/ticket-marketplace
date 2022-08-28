@@ -28,9 +28,7 @@ export const Event = () => {
     <Box>
       <Text h1>{event?.title}</Text>
       <Box>{isMounted && <Account />}</Box>
-      <Form methods={methods}>
-        <FormInput name="title" />
-      </Form>
+      <Form methods={methods}>{/*<FormInput name="title" />*/}</Form>
 
       <div>Total tickets: {event?.ticketCount}</div>
       <div>Tickets sold: {event?.ticketSold}</div>
