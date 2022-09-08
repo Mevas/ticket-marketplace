@@ -23,12 +23,14 @@ export const Ticket = ({ ticket }: TicketProps) => {
     const message = ticket.id.toString();
     const signedMessage = await signer?.signMessage(message);
 
-    setMessage(
+    const encodedMesasge = `http://localhost:9000/tickets/verify/${new Buffer(
       JSON.stringify({
         message,
         signedMessage,
       })
-    );
+    ).toString("base64")}`;
+
+    setMessage(encodedMesasge);
   };
 
   return (
@@ -102,11 +104,7 @@ export const Ticket = ({ ticket }: TicketProps) => {
               cursor: "pointer",
             }}
           >
-            <Link
-              href={`http://localhost:9000/tickets/verify/${new Buffer(
-                message
-              ).toString("base64")}`}
-            >
+            <Link href={message}>
               <QRCode
                 value={message}
                 style={{

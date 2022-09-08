@@ -10,7 +10,7 @@ export const Tickets = () => {
       style={{
         display: "grid",
         gap: 32,
-        gridTemplateColumns: "repeat(5, auto)",
+        gridTemplateColumns: "repeat(5, 1fr)",
       }}
     >
       {tickets?.map((ticket, index) => (

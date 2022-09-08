@@ -1,10 +1,8 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Headers,
-  Param,
   Patch,
   Post,
   UseGuards,
@@ -30,11 +28,6 @@ export class UsersController {
     return await this.usersService.create(createUserDto, address);
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
   @Get('me')
   @UseGuards(AuthGuard)
   me(@CurrentUser() user: User) {
@@ -45,10 +38,5 @@ export class UsersController {
   @UseGuards(AuthGuard)
   update(@CurrentUser() user: User, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(user.id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
   }
 }

@@ -1,5 +1,4 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { CreateTicketDto } from './dto/create-ticket.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { BigNumber, ethers, Event } from 'ethers';
 import { EventsService } from '../events/events.service';
@@ -43,7 +42,7 @@ export class TicketsService implements OnModuleInit {
                   id: mintingForEvent,
                 },
               },
-              art: null,
+              art: 'https://images.hdqwalls.com/wallpapers/formation-abstract-colors-4k-1e.jpg',
               tier: 'GA',
               id: id.toNumber(),
               number: -1,
@@ -56,18 +55,6 @@ export class TicketsService implements OnModuleInit {
         }
       }
     }) as (from: string, to: string, id: BigNumber, event: Event) => void);
-  }
-
-  create(createTicketDto: CreateTicketDto) {
-    return 'This action adds a new ticket';
-  }
-
-  findAll() {
-    return `This action returns all tickets`;
-  }
-
-  findOne(id: number) {
-    return { text: `This action returns a #${id} ticket` };
   }
 
   async getTickets(address: string) {

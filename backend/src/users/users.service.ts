@@ -23,10 +23,6 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return `This action returns all users`;
-  }
-
   findOne(address: string) {
     return this.prisma.user.findUnique({
       where: {
@@ -48,9 +44,5 @@ export class UsersService {
         throw new BadRequestException(e);
       }
     }
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 }

@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { CryptoTicketService } from '../crypto-ticket/crypto-ticket.service';
 import { Event, User } from '@prisma/client';
@@ -35,7 +34,6 @@ export class EventsService {
     return event;
   }
 
-  // TODO: optimize
   async getSoldTickets(
     event: Event & { organizer: User; _count: { tickets: number } },
   ) {
@@ -127,14 +125,6 @@ export class EventsService {
       ticketCount: event._count.tickets,
       ticketSold: await this.getSoldTickets(event),
     };
-  }
-
-  update(id: number, updateEventDto: UpdateEventDto) {
-    return `This action updates a #${id} event`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} event`;
   }
 
   async getEventOwnedByAddress(id: number, address: string) {
