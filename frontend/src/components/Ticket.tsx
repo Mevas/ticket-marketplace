@@ -43,6 +43,9 @@ export const Ticket = ({ ticket }: TicketProps) => {
           right: 0,
           left: 12,
           display: "grid",
+          "& *": {
+            color: "white",
+          },
         }}
       >
         <Text h2>{ticket.event.title}</Text>
