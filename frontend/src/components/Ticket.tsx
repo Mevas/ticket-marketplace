@@ -48,12 +48,32 @@ export const Ticket = ({ ticket }: TicketProps) => {
           },
         }}
       >
-        <Text h2>{ticket.event.title}</Text>
-        <Text h4 i>
+        <Text h2 color="white">
+          {ticket.event.title}
+        </Text>
+        <Text
+          h4
+          i
+          color="white"
+          css={{
+            "& *": {
+              color: "white",
+            },
+          }}
+        >
           {ticket.tier} ticket
         </Text>
 
-        <Text h2 i style={{ position: "absolute", top: 12, right: 48 }}>
+        <Text
+          h2
+          i
+          style={{ position: "absolute", top: 12, right: 48 }}
+          css={{
+            "& *": {
+              color: "white",
+            },
+          }}
+        >
           #{ticket.id}
         </Text>
       </Card.Header>

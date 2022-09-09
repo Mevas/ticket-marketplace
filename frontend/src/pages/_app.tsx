@@ -30,7 +30,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
           queries: {
             cacheTime: 1_000 * 60 * 60 * 24, // 24 hours
             networkMode: "offlineFirst",
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
             retry: 0,
           },
           mutations: {

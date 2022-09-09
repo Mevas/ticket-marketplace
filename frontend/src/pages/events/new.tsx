@@ -64,7 +64,7 @@ const CreateEvent = () => {
         <FormInput labelPlaceholder="Description" name="description" required />
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-          <Link href="/events/new">
+          <Link href="/">
             <Button auto flat color="error">
               Cancel
             </Button>
