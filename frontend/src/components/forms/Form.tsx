@@ -19,10 +19,13 @@ export const Form = <TFieldValues extends Record<string, any>>({
   children,
   methods,
   onSubmit,
+  ...props
 }: FormProps<TFieldValues>) => {
   return (
     <FormProvider {...methods}>
-      <form onSubmit={onSubmit ?? (() => {})}>{children}</form>
+      <form onSubmit={onSubmit ?? (() => {})} {...props}>
+        {children}
+      </form>
     </FormProvider>
   );
 };

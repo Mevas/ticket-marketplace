@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Loading, Text } from "@nextui-org/react";
+import { Text } from "@nextui-org/react";
 import { Box } from "../../components/Box";
 import { Form } from "../../components/forms/Form";
 import { FormInput } from "../../components/forms/FormInput";
@@ -10,6 +10,7 @@ import { axiosInstance } from "../../utils/auth";
 import { useRouter } from "next/router";
 import { Event } from "../../types";
 import { AxiosError } from "axios";
+import { Button } from "../../components/Button";
 
 type EventFormParams = Event;
 
@@ -44,9 +45,10 @@ const CreateEvent = () => {
       css={{
         backgroundColor: "$accents0",
         borderRadius: 16,
-        display: "flex",
         justifyContent: "center",
         padding: "$6",
+        m: "auto",
+        w: "25%",
       }}
     >
       <Text size="$xl4">Create a new event</Text>
@@ -56,23 +58,26 @@ const CreateEvent = () => {
           createEvent.mutate(values);
         })}
         methods={methods}
+        style={{ display: "grid", gap: 32, paddingTop: 24 }}
       >
-        <FormInput placeholder="Title" name="title" required />
-        {/*<FormInput placeholder="Name" name="name" required />*/}
+        <FormInput labelPlaceholder="Title" name="title" required />
+        <FormInput labelPlaceholder="Description" name="description" required />
 
-        <Link href="/events/new">
-          <Button auto flat color="error">
-            Cancel
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+          <Link href="/events/new">
+            <Button auto flat color="error">
+              Cancel
+            </Button>
+          </Link>
+
+          <Button
+            css={{ minWidth: 130 }}
+            type="submit"
+            loading={createEvent.isLoading}
+          >
+            Create event
           </Button>
-        </Link>
-
-        <Button css={{ minWidth: 130 }} type="submit">
-          {createEvent.isLoading ? (
-            <Loading type="spinner" color="currentColor" size="sm" />
-          ) : (
-            "Create event"
-          )}
-        </Button>
+        </div>
       </Form>
     </Box>
   );

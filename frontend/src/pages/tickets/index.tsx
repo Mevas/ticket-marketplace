@@ -5,6 +5,10 @@ import { Ticket } from "../../components/Ticket";
 export const Tickets = () => {
   const tickets = useTickets();
 
+  if (!tickets) {
+    return null;
+  }
+
   return (
     <div
       style={{
