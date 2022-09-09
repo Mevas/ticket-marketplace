@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BigNumber, ethers, Event } from 'ethers';
 import { EventsService } from '../events/events.service';
@@ -76,15 +76,28 @@ export class TicketsService implements OnModuleInit {
   }
 
   async verifyTicket(signedTicket: { message: string; signedMessage: string }) {
-    const messageAddress = ethers.utils.verifyMessage(
-      signedTicket.message,
-      signedTicket.signedMessage,
-    );
+    let messageAddress;
+    try {
+      messageAddress = ethers.utils.verifyMessage(
+        signedTicket.message,
+        signedTicket.signedMessage,
+      );
+    } catch (e) {
+      throw new BadRequestException('Invalid message');
+    }
 
     const ownerOfTicket = await this.cryptoTickets.contract.ownerOf(
       +signedTicket.message,
     );
 
-    return ownerOfTicket === messageAddress;
+    if (ownerOfTicket !== messageAddress) {
+      return false;
+    }
+
+    return await this.prisma.user.findFirstOrThrow({
+      where: {
+        walletAddress: messageAddress.toLowerCase(),
+      },
+    });
   }
 }
