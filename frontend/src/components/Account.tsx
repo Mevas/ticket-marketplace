@@ -38,7 +38,12 @@ export const Account = () => {
     addressOrName: contract.address,
     contractInterface: CryptoTicketABI.abi,
     functionName: "safeMintForEvent",
-    args: [account.address, quantity, +id!, utils.parseEther(price.toString())],
+    args: [
+      account.address,
+      quantity,
+      +id!,
+      price ? utils.parseEther(price.toString()) : null,
+    ],
     enabled: typeof id !== "undefined",
   });
   const { write, data, isLoading: isTransacting } = useContractWrite(config);
@@ -61,7 +66,12 @@ export const Account = () => {
   });
 
   return (
-    <Box>
+    <Box style={{ display: "grid", gap: 16 }}>
+      <Form methods={methods} style={{ display: "grid", gap: 6 }}>
+        <FormInput label="Quantity" name="quantity" type="number" />
+        <FormInput label="Price (ETH)" name="price" type="number" />
+      </Form>
+
       <Button
         disabled={!write}
         onClick={() => write?.()}
@@ -71,11 +81,6 @@ export const Account = () => {
       >
         Mint
       </Button>
-
-      <Form methods={methods}>
-        <FormInput label="Quantity" name="quantity" type="number" />
-        <FormInput label="Price (ETH)" name="price" type="number" />
-      </Form>
     </Box>
   );
 };
